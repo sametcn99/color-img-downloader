@@ -39,6 +39,42 @@ export const DownloadControls: React.FC<DownloadControlsProps> = ({
 	const [isDownloading, setIsDownloading] = useState(false);
 	const [error, setError] = useState<string | null>(null);
 
+	// Önceden tanımlanmış boyutlar
+	const presetSizes = [
+		{ label: "Custom", width: 0, height: 0 },
+		{ label: "Instagram Post (1080×1080)", width: 1080, height: 1080 },
+		{ label: "Instagram Story (1080×1920)", width: 1080, height: 1920 },
+		{ label: "Facebook Post (1200×630)", width: 1200, height: 630 },
+		{ label: "Twitter Header (1500×500)", width: 1500, height: 500 },
+		{ label: "LinkedIn Banner (1584×396)", width: 1584, height: 396 },
+		{ label: "YouTube Thumbnail (1280×720)", width: 1280, height: 720 },
+		{ label: "Desktop Wallpaper (1920×1080)", width: 1920, height: 1080 },
+		{ label: "Mobile Wallpaper (1080×1920)", width: 1080, height: 1920 },
+		{ label: "Square Small (512×512)", width: 512, height: 512 },
+		{ label: "Square Medium (1024×1024)", width: 1024, height: 1024 },
+		{ label: "Square Large (2048×2048)", width: 2048, height: 2048 },
+	];
+
+	const getCurrentPreset = () => {
+		const currentPreset = presetSizes.find(
+			(preset) =>
+				preset.width === downloadOptions.width &&
+				preset.height === downloadOptions.height,
+		);
+		return currentPreset ? currentPreset.label : "Custom";
+	};
+
+	const handlePresetChange = (presetLabel: string) => {
+		const preset = presetSizes.find((p) => p.label === presetLabel);
+		if (preset && preset.label !== "Custom") {
+			setDownloadOptions((prev) => ({
+				...prev,
+				width: preset.width,
+				height: preset.height,
+			}));
+		}
+	};
+
 	const handleFormatChange = (format: ImageFormat) => {
 		setDownloadOptions((prev) => ({ ...prev, format }));
 	};
@@ -97,6 +133,21 @@ export const DownloadControls: React.FC<DownloadControlsProps> = ({
 						{Object.entries(formatLabels).map(([format, label]) => (
 							<MenuItem key={format} value={format}>
 								{label}
+							</MenuItem>
+						))}
+					</Select>
+				</FormControl>
+
+				<FormControl fullWidth>
+					<InputLabel>Preset Size</InputLabel>
+					<Select
+						value={getCurrentPreset()}
+						label="Preset Size"
+						onChange={(e) => handlePresetChange(e.target.value as string)}
+					>
+						{presetSizes.map((preset) => (
+							<MenuItem key={preset.label} value={preset.label}>
+								{preset.label}
 							</MenuItem>
 						))}
 					</Select>
