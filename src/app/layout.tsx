@@ -1,5 +1,8 @@
 import CssBaseline from "@mui/material/CssBaseline";
 import { AppRouterCacheProvider } from "@mui/material-nextjs/v15-appRouter";
+import Box from "@mui/material/Box";
+import Link from "@mui/material/Link";
+import Typography from "@mui/material/Typography";
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 
@@ -30,6 +33,32 @@ export default function RootLayout({
 				<AppRouterCacheProvider>
 					<CssBaseline />
 					{children}
+					<Box
+						component="footer"
+						sx={{
+							textAlign: 'center',
+							padding: 2.5,
+							marginTop: 'auto',
+							borderTop: '1px solid #eee',
+						}}
+					>
+						<Link
+							href="https://github.com/sametcn99/color-img-downloader"
+							target="_blank"
+							rel="noopener noreferrer"
+							sx={{
+								color: 'primary.main',
+								textDecoration: 'none',
+								fontWeight: 500,
+								fontSize: '14px',
+								'&:hover': {
+									textDecoration: 'underline',
+								},
+							}}
+						>
+							📋 Source Code
+						</Link>
+					</Box>
 				</AppRouterCacheProvider>
 			</body>
 		</html>
