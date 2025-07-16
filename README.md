@@ -267,10 +267,6 @@ We welcome contributions! Please feel free to submit a Pull Request. For major c
 4. Push to the branch (`git push origin feature/AmazingFeature`)
 5. Open a Pull Request
 
-## 📄 **License**
-
-This project is open source and available under the [MIT License](LICENSE).
-
 ## 🙏 **Acknowledgments**
 
 - Built with [Next.js](https://nextjs.org/) - The React framework for production
@@ -279,7 +275,5 @@ This project is open source and available under the [MIT License](LICENSE).
 - Icons from [Material Design Icons](https://material-design-icons.github.io/Material-Design-Icons/)
 
 ---
-
-**Made with ❤️ by [sametcn99](https://github.com/sametcn99)**
 
 *Star ⭐ this repository if you find it helpful!*
