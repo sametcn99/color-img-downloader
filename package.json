@@ -2,6 +2,19 @@
 	"name": "color-img-downloader",
 	"version": "0.1.0",
 	"private": true,
+	"author": {
+		"email": "sametcn99@gmail.com",
+		"name": "sametcn99",
+		"url": "https://sametcc.me"
+	},
+	"description": "A Next.js app for downloading images based on color.",
+	"packageManager": "bun@1.2.15",
+	"repository": {
+		"directory": "",
+		"type": "git",
+		"url": "https://github.com/sametcn99/color-img-downloader.git"
+	},
+	"homepage": "https://color-img-downloader.vercel.app",
 	"scripts": {
 		"dev": "next dev --turbopack",
 		"build": "next build",

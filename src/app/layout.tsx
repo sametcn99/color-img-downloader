@@ -43,7 +43,7 @@ export default function RootLayout({
 						}}
 					>
 						<Link
-							href="https://github.com/sametcn99/color-img-downloader"
+							href="https://sametcc.me/color-img-downloader"
 							target="_blank"
 							rel="noopener noreferrer"
 							sx={{
