@@ -1,9 +1,15 @@
 "use client";
 
-import { Box, Paper, Typography } from "@mui/material";
+import { Box, Paper, Typography, Stack, Chip } from "@mui/material";
 import type React from "react";
 import type { RGBAColor } from "../../types/color";
-import { rgbaToHex, rgbaToString } from "../../utils/colorConversions";
+import { 
+	rgbaToHex, 
+	rgbaToString, 
+	rgbaToHsla, 
+	rgbaToHsva,
+	formatColorString 
+} from "../../utils/colorConversions";
 
 interface ColorPreviewProps {
 	color: RGBAColor;
@@ -16,6 +22,8 @@ export const ColorPreview: React.FC<ColorPreviewProps> = ({
 }) => {
 	const colorString = rgbaToString(color);
 	const hexString = rgbaToHex(color);
+	const hsl = rgbaToHsla(color);
+	const hsv = rgbaToHsva(color);
 
 	return (
 		<Paper
@@ -70,19 +78,61 @@ export const ColorPreview: React.FC<ColorPreviewProps> = ({
 				aria-label={`Color preview: ${hexString} with ${Math.round(color.a * 100)}% opacity`}
 			/>
 
-			<Typography variant="body2" color="text.secondary" gutterBottom>
-				{hexString}
-			</Typography>
+			<Stack spacing={2}>
+				<Box>
+					<Typography variant="body2" color="text.secondary" gutterBottom>
+						Primary Formats
+					</Typography>
+					<Stack spacing={1}>
+						<Chip 
+							label={`HEX: ${hexString}`} 
+							size="small" 
+							variant="outlined"
+							sx={{ fontFamily: "monospace" }}
+						/>
+						<Chip 
+							label={`RGB: ${formatColorString(color, "rgb")}`} 
+							size="small" 
+							variant="outlined"
+							sx={{ fontFamily: "monospace" }}
+						/>
+						{color.a < 1 && (
+							<Chip 
+								label={`RGBA: ${colorString}`} 
+								size="small" 
+								variant="outlined"
+								sx={{ fontFamily: "monospace" }}
+							/>
+						)}
+					</Stack>
+				</Box>
 
-			<Typography variant="body2" color="text.secondary">
-				{colorString}
-			</Typography>
+				<Box>
+					<Typography variant="body2" color="text.secondary" gutterBottom>
+						Alternative Formats
+					</Typography>
+					<Stack spacing={1}>
+						<Chip 
+							label={`HSL: hsl(${hsl.h}, ${hsl.s}%, ${hsl.l}%)`} 
+							size="small" 
+							variant="outlined"
+							sx={{ fontFamily: "monospace" }}
+						/>
+						<Chip 
+							label={`HSV: hsv(${hsv.h}, ${hsv.s}%, ${hsv.v}%)`} 
+							size="small" 
+							variant="outlined"
+							sx={{ fontFamily: "monospace" }}
+						/>
+					</Stack>
+				</Box>
 
-			{color.a < 1 && (
-				<Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
-					Opacity: {Math.round(color.a * 100)}%
-				</Typography>
-			)}
+				{color.a < 1 && (
+					<Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
+						Opacity: {Math.round(color.a * 100)}%
+					</Typography>
+				)}
+			</Stack>
 		</Paper>
 	);
 };
