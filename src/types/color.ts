@@ -44,7 +44,18 @@ export interface LCHColor {
 	h: number; // 0-360
 }
 
-export type ColorFormat = "hex" | "rgb" | "rgba" | "hsl" | "hsla" | "hsv" | "hsva" | "cmyk" | "lab" | "hwb" | "lch";
+export type ColorFormat =
+	| "hex"
+	| "rgb"
+	| "rgba"
+	| "hsl"
+	| "hsla"
+	| "hsv"
+	| "hsva"
+	| "cmyk"
+	| "lab"
+	| "hwb"
+	| "lch";
 
 export type ImageFormat = "png" | "jpeg" | "svg";
 

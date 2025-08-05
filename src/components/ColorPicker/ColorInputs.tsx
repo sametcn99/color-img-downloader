@@ -13,24 +13,28 @@ import {
 	Typography,
 } from "@mui/material";
 import React, { useState } from "react";
-import type { RGBAColor, ColorFormat, ColorFormatInputs } from "../../types/color";
+import type {
+	ColorFormat,
+	ColorFormatInputs,
+	RGBAColor,
+} from "../../types/color";
 import {
 	clamp,
+	cmykToRgba,
 	hexToRgba,
+	hslaToRgba,
+	hsvaToRgba,
+	hwbToRgba,
 	isValidHex,
+	labToRgba,
+	lchToRgba,
+	rgbaToCmyk,
 	rgbaToHex,
 	rgbaToHsla,
-	hslaToRgba,
 	rgbaToHsva,
-	hsvaToRgba,
-	rgbaToCmyk,
-	cmykToRgba,
-	rgbaToLab,
-	labToRgba,
 	rgbaToHwb,
-	hwbToRgba,
+	rgbaToLab,
 	rgbaToLch,
-	lchToRgba,
 } from "../../utils/colorConversions";
 
 interface ColorInputsProps {
@@ -158,7 +162,7 @@ export const ColorInputs: React.FC<ColorInputsProps> = ({
 
 	const handleHexChange = (event: React.ChangeEvent<HTMLInputElement>) => {
 		const value = event.target.value;
-		setInputValues(prev => ({ ...prev, hex: value }));
+		setInputValues((prev) => ({ ...prev, hex: value }));
 
 		if (isValidHex(value)) {
 			const newColor = hexToRgba(value, color.a);
@@ -167,107 +171,121 @@ export const ColorInputs: React.FC<ColorInputsProps> = ({
 		}
 	};
 
-	const handleRgbChange = (channel: "r" | "g" | "b" | "a") => (event: React.ChangeEvent<HTMLInputElement>) => {
-		const value = event.target.value;
-		const newRgb = { ...inputValues.rgb, [channel]: value };
-		setInputValues(prev => ({ ...prev, rgb: newRgb }));
+	const handleRgbChange =
+		(channel: "r" | "g" | "b" | "a") =>
+		(event: React.ChangeEvent<HTMLInputElement>) => {
+			const value = event.target.value;
+			const newRgb = { ...inputValues.rgb, [channel]: value };
+			setInputValues((prev) => ({ ...prev, rgb: newRgb }));
 
-		const r = clamp(parseInt(newRgb.r) || 0, 0, 255);
-		const g = clamp(parseInt(newRgb.g) || 0, 0, 255);
-		const b = clamp(parseInt(newRgb.b) || 0, 0, 255);
-		const a = clamp((parseInt(newRgb.a) || 0) / 100, 0, 1);
+			const r = clamp(parseInt(newRgb.r) || 0, 0, 255);
+			const g = clamp(parseInt(newRgb.g) || 0, 0, 255);
+			const b = clamp(parseInt(newRgb.b) || 0, 0, 255);
+			const a = clamp((parseInt(newRgb.a) || 0) / 100, 0, 1);
 
-		const newColor: RGBAColor = { r, g, b, a };
-		onColorChange(newColor);
-		updateInputValues(newColor);
-	};
+			const newColor: RGBAColor = { r, g, b, a };
+			onColorChange(newColor);
+			updateInputValues(newColor);
+		};
 
-	const handleHslChange = (channel: "h" | "s" | "l" | "a") => (event: React.ChangeEvent<HTMLInputElement>) => {
-		const value = event.target.value;
-		const newHsl = { ...inputValues.hsl, [channel]: value };
-		setInputValues(prev => ({ ...prev, hsl: newHsl }));
+	const handleHslChange =
+		(channel: "h" | "s" | "l" | "a") =>
+		(event: React.ChangeEvent<HTMLInputElement>) => {
+			const value = event.target.value;
+			const newHsl = { ...inputValues.hsl, [channel]: value };
+			setInputValues((prev) => ({ ...prev, hsl: newHsl }));
 
-		const h = clamp(parseInt(newHsl.h) || 0, 0, 360);
-		const s = clamp(parseInt(newHsl.s) || 0, 0, 100);
-		const l = clamp(parseInt(newHsl.l) || 0, 0, 100);
-		const a = clamp((parseInt(newHsl.a) || 0) / 100, 0, 1);
+			const h = clamp(parseInt(newHsl.h) || 0, 0, 360);
+			const s = clamp(parseInt(newHsl.s) || 0, 0, 100);
+			const l = clamp(parseInt(newHsl.l) || 0, 0, 100);
+			const a = clamp((parseInt(newHsl.a) || 0) / 100, 0, 1);
 
-		const newColor = hslaToRgba({ h, s, l, a });
-		onColorChange(newColor);
-		updateInputValues(newColor);
-	};
+			const newColor = hslaToRgba({ h, s, l, a });
+			onColorChange(newColor);
+			updateInputValues(newColor);
+		};
 
-	const handleHsvChange = (channel: "h" | "s" | "v" | "a") => (event: React.ChangeEvent<HTMLInputElement>) => {
-		const value = event.target.value;
-		const newHsv = { ...inputValues.hsv, [channel]: value };
-		setInputValues(prev => ({ ...prev, hsv: newHsv }));
+	const handleHsvChange =
+		(channel: "h" | "s" | "v" | "a") =>
+		(event: React.ChangeEvent<HTMLInputElement>) => {
+			const value = event.target.value;
+			const newHsv = { ...inputValues.hsv, [channel]: value };
+			setInputValues((prev) => ({ ...prev, hsv: newHsv }));
 
-		const h = clamp(parseInt(newHsv.h) || 0, 0, 360);
-		const s = clamp(parseInt(newHsv.s) || 0, 0, 100);
-		const v = clamp(parseInt(newHsv.v) || 0, 0, 100);
-		const a = clamp((parseInt(newHsv.a) || 0) / 100, 0, 1);
+			const h = clamp(parseInt(newHsv.h) || 0, 0, 360);
+			const s = clamp(parseInt(newHsv.s) || 0, 0, 100);
+			const v = clamp(parseInt(newHsv.v) || 0, 0, 100);
+			const a = clamp((parseInt(newHsv.a) || 0) / 100, 0, 1);
 
-		const newColor = hsvaToRgba({ h, s, v, a });
-		onColorChange(newColor);
-		updateInputValues(newColor);
-	};
+			const newColor = hsvaToRgba({ h, s, v, a });
+			onColorChange(newColor);
+			updateInputValues(newColor);
+		};
 
-	const handleCmykChange = (channel: "c" | "m" | "y" | "k") => (event: React.ChangeEvent<HTMLInputElement>) => {
-		const value = event.target.value;
-		const newCmyk = { ...inputValues.cmyk, [channel]: value };
-		setInputValues(prev => ({ ...prev, cmyk: newCmyk }));
+	const handleCmykChange =
+		(channel: "c" | "m" | "y" | "k") =>
+		(event: React.ChangeEvent<HTMLInputElement>) => {
+			const value = event.target.value;
+			const newCmyk = { ...inputValues.cmyk, [channel]: value };
+			setInputValues((prev) => ({ ...prev, cmyk: newCmyk }));
 
-		const c = clamp(parseInt(newCmyk.c) || 0, 0, 100);
-		const m = clamp(parseInt(newCmyk.m) || 0, 0, 100);
-		const y = clamp(parseInt(newCmyk.y) || 0, 0, 100);
-		const k = clamp(parseInt(newCmyk.k) || 0, 0, 100);
+			const c = clamp(parseInt(newCmyk.c) || 0, 0, 100);
+			const m = clamp(parseInt(newCmyk.m) || 0, 0, 100);
+			const y = clamp(parseInt(newCmyk.y) || 0, 0, 100);
+			const k = clamp(parseInt(newCmyk.k) || 0, 0, 100);
 
-		const newColor = cmykToRgba({ c, m, y, k }, color.a);
-		onColorChange(newColor);
-		updateInputValues(newColor);
-	};
+			const newColor = cmykToRgba({ c, m, y, k }, color.a);
+			onColorChange(newColor);
+			updateInputValues(newColor);
+		};
 
-	const handleLabChange = (channel: "l" | "a" | "b") => (event: React.ChangeEvent<HTMLInputElement>) => {
-		const value = event.target.value;
-		const newLab = { ...inputValues.lab, [channel]: value };
-		setInputValues(prev => ({ ...prev, lab: newLab }));
+	const handleLabChange =
+		(channel: "l" | "a" | "b") =>
+		(event: React.ChangeEvent<HTMLInputElement>) => {
+			const value = event.target.value;
+			const newLab = { ...inputValues.lab, [channel]: value };
+			setInputValues((prev) => ({ ...prev, lab: newLab }));
 
-		const l = clamp(parseInt(newLab.l) || 0, 0, 100);
-		const a = clamp(parseInt(newLab.a) || 0, -128, 127);
-		const b = clamp(parseInt(newLab.b) || 0, -128, 127);
+			const l = clamp(parseInt(newLab.l) || 0, 0, 100);
+			const a = clamp(parseInt(newLab.a) || 0, -128, 127);
+			const b = clamp(parseInt(newLab.b) || 0, -128, 127);
 
-		const newColor = labToRgba({ l, a, b }, color.a);
-		onColorChange(newColor);
-		updateInputValues(newColor);
-	};
+			const newColor = labToRgba({ l, a, b }, color.a);
+			onColorChange(newColor);
+			updateInputValues(newColor);
+		};
 
-	const handleHwbChange = (channel: "h" | "w" | "b") => (event: React.ChangeEvent<HTMLInputElement>) => {
-		const value = event.target.value;
-		const newHwb = { ...inputValues.hwb, [channel]: value };
-		setInputValues(prev => ({ ...prev, hwb: newHwb }));
+	const handleHwbChange =
+		(channel: "h" | "w" | "b") =>
+		(event: React.ChangeEvent<HTMLInputElement>) => {
+			const value = event.target.value;
+			const newHwb = { ...inputValues.hwb, [channel]: value };
+			setInputValues((prev) => ({ ...prev, hwb: newHwb }));
 
-		const h = clamp(parseInt(newHwb.h) || 0, 0, 360);
-		const w = clamp(parseInt(newHwb.w) || 0, 0, 100);
-		const b = clamp(parseInt(newHwb.b) || 0, 0, 100);
+			const h = clamp(parseInt(newHwb.h) || 0, 0, 360);
+			const w = clamp(parseInt(newHwb.w) || 0, 0, 100);
+			const b = clamp(parseInt(newHwb.b) || 0, 0, 100);
 
-		const newColor = hwbToRgba({ h, w, b }, color.a);
-		onColorChange(newColor);
-		updateInputValues(newColor);
-	};
+			const newColor = hwbToRgba({ h, w, b }, color.a);
+			onColorChange(newColor);
+			updateInputValues(newColor);
+		};
 
-	const handleLchChange = (channel: "l" | "c" | "h") => (event: React.ChangeEvent<HTMLInputElement>) => {
-		const value = event.target.value;
-		const newLch = { ...inputValues.lch, [channel]: value };
-		setInputValues(prev => ({ ...prev, lch: newLch }));
+	const handleLchChange =
+		(channel: "l" | "c" | "h") =>
+		(event: React.ChangeEvent<HTMLInputElement>) => {
+			const value = event.target.value;
+			const newLch = { ...inputValues.lch, [channel]: value };
+			setInputValues((prev) => ({ ...prev, lch: newLch }));
 
-		const l = clamp(parseInt(newLch.l) || 0, 0, 100);
-		const c = clamp(parseInt(newLch.c) || 0, 0, 150);
-		const h = clamp(parseInt(newLch.h) || 0, 0, 360);
+			const l = clamp(parseInt(newLch.l) || 0, 0, 100);
+			const c = clamp(parseInt(newLch.c) || 0, 0, 150);
+			const h = clamp(parseInt(newLch.h) || 0, 0, 360);
 
-		const newColor = lchToRgba({ l, c, h }, color.a);
-		onColorChange(newColor);
-		updateInputValues(newColor);
-	};
+			const newColor = lchToRgba({ l, c, h }, color.a);
+			onColorChange(newColor);
+			updateInputValues(newColor);
+		};
 
 	// Update local state when color prop changes
 	React.useEffect(() => {
@@ -589,9 +607,7 @@ export const ColorInputs: React.FC<ColorInputsProps> = ({
 				</Select>
 			</FormControl>
 
-			<Box sx={{ mb: 2 }}>
-				{renderInputs()}
-			</Box>
+			<Box sx={{ mb: 2 }}>{renderInputs()}</Box>
 
 			<Typography variant="body2" color="text.secondary" sx={{ mt: 2 }}>
 				{selectedFormat.toUpperCase()} format values with real-time updates

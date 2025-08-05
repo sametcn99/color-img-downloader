@@ -1,8 +1,7 @@
-import CssBaseline from "@mui/material/CssBaseline";
-import { AppRouterCacheProvider } from "@mui/material-nextjs/v15-appRouter";
 import Box from "@mui/material/Box";
+import CssBaseline from "@mui/material/CssBaseline";
 import Link from "@mui/material/Link";
-import Typography from "@mui/material/Typography";
+import { AppRouterCacheProvider } from "@mui/material-nextjs/v15-appRouter";
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 
@@ -36,10 +35,10 @@ export default function RootLayout({
 					<Box
 						component="footer"
 						sx={{
-							textAlign: 'center',
+							textAlign: "center",
 							padding: 2.5,
-							marginTop: 'auto',
-							borderTop: '1px solid #eee',
+							marginTop: "auto",
+							borderTop: "1px solid #eee",
 						}}
 					>
 						<Link
@@ -47,12 +46,12 @@ export default function RootLayout({
 							target="_blank"
 							rel="noopener noreferrer"
 							sx={{
-								color: 'primary.main',
-								textDecoration: 'none',
+								color: "primary.main",
+								textDecoration: "none",
 								fontWeight: 500,
-								fontSize: '14px',
-								'&:hover': {
-									textDecoration: 'underline',
+								fontSize: "14px",
+								"&:hover": {
+									textDecoration: "underline",
 								},
 							}}
 						>

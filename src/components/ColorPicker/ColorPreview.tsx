@@ -1,14 +1,14 @@
 "use client";
 
-import { Box, Paper, Typography, Stack, Chip } from "@mui/material";
+import { Box, Chip, Paper, Stack, Typography } from "@mui/material";
 import type React from "react";
 import type { RGBAColor } from "../../types/color";
-import { 
-	rgbaToHex, 
-	rgbaToString, 
-	rgbaToHsla, 
+import {
+	formatColorString,
+	rgbaToHex,
+	rgbaToHsla,
 	rgbaToHsva,
-	formatColorString 
+	rgbaToString,
 } from "../../utils/colorConversions";
 
 interface ColorPreviewProps {
@@ -84,22 +84,22 @@ export const ColorPreview: React.FC<ColorPreviewProps> = ({
 						Primary Formats
 					</Typography>
 					<Stack spacing={1}>
-						<Chip 
-							label={`HEX: ${hexString}`} 
-							size="small" 
+						<Chip
+							label={`HEX: ${hexString}`}
+							size="small"
 							variant="outlined"
 							sx={{ fontFamily: "monospace" }}
 						/>
-						<Chip 
-							label={`RGB: ${formatColorString(color, "rgb")}`} 
-							size="small" 
+						<Chip
+							label={`RGB: ${formatColorString(color, "rgb")}`}
+							size="small"
 							variant="outlined"
 							sx={{ fontFamily: "monospace" }}
 						/>
 						{color.a < 1 && (
-							<Chip 
-								label={`RGBA: ${colorString}`} 
-								size="small" 
+							<Chip
+								label={`RGBA: ${colorString}`}
+								size="small"
 								variant="outlined"
 								sx={{ fontFamily: "monospace" }}
 							/>
@@ -112,15 +112,15 @@ export const ColorPreview: React.FC<ColorPreviewProps> = ({
 						Alternative Formats
 					</Typography>
 					<Stack spacing={1}>
-						<Chip 
-							label={`HSL: hsl(${hsl.h}, ${hsl.s}%, ${hsl.l}%)`} 
-							size="small" 
+						<Chip
+							label={`HSL: hsl(${hsl.h}, ${hsl.s}%, ${hsl.l}%)`}
+							size="small"
 							variant="outlined"
 							sx={{ fontFamily: "monospace" }}
 						/>
-						<Chip 
-							label={`HSV: hsv(${hsv.h}, ${hsv.s}%, ${hsv.v}%)`} 
-							size="small" 
+						<Chip
+							label={`HSV: hsv(${hsv.h}, ${hsv.s}%, ${hsv.v}%)`}
+							size="small"
 							variant="outlined"
 							sx={{ fontFamily: "monospace" }}
 						/>

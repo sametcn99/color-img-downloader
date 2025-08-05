@@ -1,4 +1,12 @@
-import type { HSLAColor, RGBAColor, HSVAColor, CMYKColor, LABColor, HWBColor, LCHColor } from "../types/color";
+import type {
+	CMYKColor,
+	HSLAColor,
+	HSVAColor,
+	HWBColor,
+	LABColor,
+	LCHColor,
+	RGBAColor,
+} from "../types/color";
 
 /**
  * Convert RGBA to HEX string
@@ -6,7 +14,7 @@ import type { HSLAColor, RGBAColor, HSVAColor, CMYKColor, LABColor, HWBColor, LC
 export function rgbaToHex(rgba: RGBAColor): string {
 	const toHex = (n: number) => {
 		const hex = Math.round(n).toString(16);
-		return hex.length === 1 ? "0" + hex : hex;
+		return hex.length === 1 ? `0${hex}` : hex;
 	};
 
 	return `#${toHex(rgba.r)}${toHex(rgba.g)}${toHex(rgba.b)}`;
@@ -211,13 +219,38 @@ export function hsvaToRgba(hsva: HSVAColor): RGBAColor {
 	let r: number, g: number, b: number;
 
 	switch (i % 6) {
-		case 0: r = v; g = t; b = p; break;
-		case 1: r = q; g = v; b = p; break;
-		case 2: r = p; g = v; b = t; break;
-		case 3: r = p; g = q; b = v; break;
-		case 4: r = t; g = p; b = v; break;
-		case 5: r = v; g = p; b = q; break;
-		default: r = g = b = 0;
+		case 0:
+			r = v;
+			g = t;
+			b = p;
+			break;
+		case 1:
+			r = q;
+			g = v;
+			b = p;
+			break;
+		case 2:
+			r = p;
+			g = v;
+			b = t;
+			break;
+		case 3:
+			r = p;
+			g = q;
+			b = v;
+			break;
+		case 4:
+			r = t;
+			g = p;
+			b = v;
+			break;
+		case 5:
+			r = v;
+			g = p;
+			b = q;
+			break;
+		default:
+			r = g = b = 0;
 	}
 
 	return {
@@ -238,7 +271,7 @@ export function rgbaToCmyk(rgba: RGBAColor): CMYKColor {
 	const b = rgba.b / 255;
 
 	const k = 1 - Math.max(r, g, b);
-	
+
 	if (k === 1) {
 		return { c: 0, m: 0, y: 0, k: 100 };
 	}
@@ -287,9 +320,9 @@ export function rgbaToLab(rgba: RGBAColor): LABColor {
 	let b = rgba.b / 255;
 
 	// Apply gamma correction
-	r = r > 0.04045 ? Math.pow((r + 0.055) / 1.055, 2.4) : r / 12.92;
-	g = g > 0.04045 ? Math.pow((g + 0.055) / 1.055, 2.4) : g / 12.92;
-	b = b > 0.04045 ? Math.pow((b + 0.055) / 1.055, 2.4) : b / 12.92;
+	r = r > 0.04045 ? ((r + 0.055) / 1.055) ** 2.4 : r / 12.92;
+	g = g > 0.04045 ? ((g + 0.055) / 1.055) ** 2.4 : g / 12.92;
+	b = b > 0.04045 ? ((b + 0.055) / 1.055) ** 2.4 : b / 12.92;
 
 	// Convert to XYZ (D65 illuminant)
 	let x = (r * 0.4124 + g * 0.3576 + b * 0.1805) / 0.95047;
@@ -297,11 +330,11 @@ export function rgbaToLab(rgba: RGBAColor): LABColor {
 	let z = (r * 0.0193 + g * 0.1192 + b * 0.9505) / 1.08883;
 
 	// Convert XYZ to LAB
-	x = x > 0.008856 ? Math.pow(x, 1 / 3) : (7.787 * x + 16 / 116);
-	y = y > 0.008856 ? Math.pow(y, 1 / 3) : (7.787 * y + 16 / 116);
-	z = z > 0.008856 ? Math.pow(z, 1 / 3) : (7.787 * z + 16 / 116);
+	x = x > 0.008856 ? x ** (1 / 3) : 7.787 * x + 16 / 116;
+	y = y > 0.008856 ? y ** (1 / 3) : 7.787 * y + 16 / 116;
+	z = z > 0.008856 ? z ** (1 / 3) : 7.787 * z + 16 / 116;
 
-	const l = (116 * y) - 16;
+	const l = 116 * y - 16;
 	const a = 500 * (x - y);
 	const bValue = 200 * (y - z);
 
@@ -320,9 +353,9 @@ export function labToRgba(lab: LABColor, alpha: number = 1): RGBAColor {
 	let x = lab.a / 500 + y;
 	let z = y - lab.b / 200;
 
-	const x3 = Math.pow(x, 3);
-	const y3 = Math.pow(y, 3);
-	const z3 = Math.pow(z, 3);
+	const x3 = x ** 3;
+	const y3 = y ** 3;
+	const z3 = z ** 3;
 
 	x = x3 > 0.008856 ? x3 : (x - 16 / 116) / 7.787;
 	y = y3 > 0.008856 ? y3 : (y - 16 / 116) / 7.787;
@@ -335,12 +368,12 @@ export function labToRgba(lab: LABColor, alpha: number = 1): RGBAColor {
 
 	let r = x * 3.2406 + y * -1.5372 + z * -0.4986;
 	let g = x * -0.9689 + y * 1.8758 + z * 0.0415;
-	let b = x * 0.0557 + y * -0.2040 + z * 1.0570;
+	let b = x * 0.0557 + y * -0.204 + z * 1.057;
 
 	// Apply gamma correction
-	r = r > 0.0031308 ? 1.055 * Math.pow(r, 1 / 2.4) - 0.055 : 12.92 * r;
-	g = g > 0.0031308 ? 1.055 * Math.pow(g, 1 / 2.4) - 0.055 : 12.92 * g;
-	b = b > 0.0031308 ? 1.055 * Math.pow(b, 1 / 2.4) - 0.055 : 12.92 * b;
+	r = r > 0.0031308 ? 1.055 * r ** (1 / 2.4) - 0.055 : 12.92 * r;
+	g = g > 0.0031308 ? 1.055 * g ** (1 / 2.4) - 0.055 : 12.92 * g;
+	b = b > 0.0031308 ? 1.055 * b ** (1 / 2.4) - 0.055 : 12.92 * b;
 
 	return {
 		r: Math.round(Math.max(0, Math.min(1, r)) * 255),
@@ -356,7 +389,7 @@ export function labToRgba(lab: LABColor, alpha: number = 1): RGBAColor {
  */
 export function rgbaToHwb(rgba: RGBAColor): HWBColor {
 	const hsv = rgbaToHsva(rgba);
-	const w = (100 - hsv.s) * hsv.v / 100;
+	const w = ((100 - hsv.s) * hsv.v) / 100;
 	const b = 100 - hsv.v;
 
 	return {
@@ -372,11 +405,11 @@ export function rgbaToHwb(rgba: RGBAColor): HWBColor {
 export function hwbToRgba(hwb: HWBColor, alpha: number = 1): RGBAColor {
 	const w = hwb.w / 100;
 	const b = hwb.b / 100;
-	
+
 	// Handle the case where w + b >= 1
 	const ratio = w + b;
 	if (ratio > 1) {
-		const gray = Math.round(255 * w / ratio);
+		const gray = Math.round((255 * w) / ratio);
 		return { r: gray, g: gray, b: gray, a: alpha };
 	}
 
@@ -400,8 +433,8 @@ export function hwbToRgba(hwb: HWBColor, alpha: number = 1): RGBAColor {
 export function rgbaToLch(rgba: RGBAColor): LCHColor {
 	const lab = rgbaToLab(rgba);
 	const c = Math.sqrt(lab.a * lab.a + lab.b * lab.b);
-	let h = Math.atan2(lab.b, lab.a) * 180 / Math.PI;
-	
+	let h = (Math.atan2(lab.b, lab.a) * 180) / Math.PI;
+
 	if (h < 0) {
 		h += 360;
 	}
@@ -417,7 +450,7 @@ export function rgbaToLch(rgba: RGBAColor): LCHColor {
  * Convert LCH to RGBA
  */
 export function lchToRgba(lch: LCHColor, alpha: number = 1): RGBAColor {
-	const hRad = lch.h * Math.PI / 180;
+	const hRad = (lch.h * Math.PI) / 180;
 	const a = lch.c * Math.cos(hRad);
 	const b = lch.c * Math.sin(hRad);
 
