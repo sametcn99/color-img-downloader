@@ -30,6 +30,7 @@
 		"@mui/icons-material": "^7.3.4",
 		"@mui/material": "^7.3.4",
 		"@mui/material-nextjs": "^7.3.3",
+		"@vercel/analytics": "^1.5.0",
 		"next": "15.5.4",
 		"react": "^19.2.0",
 		"react-dom": "^19.2.0"
