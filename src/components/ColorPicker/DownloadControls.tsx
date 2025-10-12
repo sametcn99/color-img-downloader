@@ -143,7 +143,14 @@ export const DownloadControls: React.FC<DownloadControlsProps> = ({
 					<Select
 						value={getCurrentPreset()}
 						label="Preset Size"
-						onChange={(e) => handlePresetChange(e.target.value as string)}
+						onChange={(e) => handlePresetChange(e.target.value)}
+						MenuProps={{
+							PaperProps: {
+								style: {
+									maxHeight: 250,
+								},
+							},
+						}}
 					>
 						{presetSizes.map((preset) => (
 							<MenuItem key={preset.label} value={preset.label}>
