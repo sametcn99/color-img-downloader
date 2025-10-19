@@ -1,10 +1,10 @@
 import Box from "@mui/material/Box";
 import CssBaseline from "@mui/material/CssBaseline";
 import Link from "@mui/material/Link";
-import { AppRouterCacheProvider } from "@mui/material-nextjs/v15-appRouter";
+import { Analytics } from "@vercel/analytics/next";
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
-import { Analytics } from "@vercel/analytics/next"
+import Providers from "@/components/Providers";
 
 const geistSans = Geist({
 	variable: "--font-geist-sans",
@@ -29,8 +29,15 @@ export default function RootLayout({
 }>) {
 	return (
 		<html lang="en">
+			<head>
+				<script
+					defer
+					src="https://umami.sametcc.me/script.js"
+					data-website-id="099e8745-8e8a-4325-877a-3c5a4f6b9746"
+				></script>
+			</head>
 			<body className={`${geistSans.variable} ${geistMono.variable}`}>
-				<AppRouterCacheProvider>
+				<Providers>
 					<CssBaseline />
 					{children}
 					<Box
@@ -39,7 +46,8 @@ export default function RootLayout({
 							textAlign: "center",
 							padding: 2.5,
 							marginTop: "auto",
-							borderTop: "1px solid #eee",
+							borderTop: "1px solid",
+							borderColor: "divider",
 						}}
 					>
 						<Link
@@ -60,7 +68,7 @@ export default function RootLayout({
 						</Link>
 					</Box>
 					<Analytics />
-				</AppRouterCacheProvider>
+				</Providers>
 			</body>
 		</html>
 	);

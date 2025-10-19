@@ -56,7 +56,14 @@ export const ColorWheelModal: React.FC<ColorWheelModalProps> = ({
 	return (
 		<>
 			{/* Küçük Color Wheel - Modal açmak için */}
-			<Box sx={{ position: "relative", display: "inline-block" }}>
+			<Box
+				sx={{
+					position: "relative",
+					display: "inline-block",
+					width: "100%",
+					height: "100%",
+				}}
+			>
 				<ColorWheel color={color} onColorChange={onColorChange} size={size} />
 
 				{/* Genişletme butonu */}

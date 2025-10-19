@@ -3,8 +3,8 @@
 	"version": "0.1.0",
 	"private": true,
 	"engines": {
-    "node": ">=20.0.0"
-  	},
+		"node": ">=20.0.0"
+	},
 	"author": {
 		"email": "sametcn99@gmail.com",
 		"name": "sametcn99",
@@ -20,7 +20,7 @@
 	"homepage": "https://color-img-downloader.vercel.app",
 	"scripts": {
 		"dev": "next dev --turbopack",
-		"build": "next build",
+		"build": "next build --turbopack",
 		"start": "next start",
 		"lint": "next lint",
 		"type-check": "tsc --noEmit",
@@ -34,15 +34,15 @@
 		"@mui/material": "^7.3.4",
 		"@mui/material-nextjs": "^7.3.3",
 		"@vercel/analytics": "^1.5.0",
-		"next": "15.5.4",
+		"next": "15.5.6",
 		"react": "^19.2.0",
 		"react-dom": "^19.2.0"
 	},
 	"devDependencies": {
-		"@biomejs/biome": "2.2.5",
-		"@types/node": "^24.7.2",
+		"@biomejs/biome": "2.2.6",
+		"@types/node": "^24.8.1",
 		"@types/react": "^19.2.2",
-		"@types/react-dom": "^19.2.1",
+		"@types/react-dom": "^19.2.2",
 		"typescript": "^5.9.3"
 	}
 }

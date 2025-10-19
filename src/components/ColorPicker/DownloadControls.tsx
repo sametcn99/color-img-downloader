@@ -16,11 +16,17 @@ import {
 } from "@mui/material";
 import type React from "react";
 import { useState } from "react";
+import { useUmami } from "../../hooks/useUmami";
 import type {
 	DownloadOptions,
 	ImageFormat,
 	RGBAColor,
 } from "../../types/color";
+import {
+	rgbaToCmyk,
+	rgbaToHex,
+	rgbaToHsla,
+} from "../../utils/colorConversions";
 import {
 	downloadColorImage,
 	getDefaultDownloadOptions,
@@ -38,6 +44,7 @@ export const DownloadControls: React.FC<DownloadControlsProps> = ({
 	);
 	const [isDownloading, setIsDownloading] = useState(false);
 	const [error, setError] = useState<string | null>(null);
+	const { trackEvent } = useUmami();
 
 	// Önceden tanımlanmış boyutlar
 	const presetSizes = [
@@ -82,7 +89,7 @@ export const DownloadControls: React.FC<DownloadControlsProps> = ({
 	const handleSizeChange =
 		(dimension: "width" | "height") =>
 		(event: React.ChangeEvent<HTMLInputElement>) => {
-			const value = parseInt(event.target.value) || 0;
+			const value = parseInt(event.target.value, 10) || 0;
 			setDownloadOptions((prev) => ({
 				...prev,
 				[dimension]: Math.max(1, value),
@@ -102,8 +109,68 @@ export const DownloadControls: React.FC<DownloadControlsProps> = ({
 		setError(null);
 
 		try {
+			// Track the download event before starting the download
+			const hex = rgbaToHex(color);
+			const hsl = rgbaToHsla(color);
+			const cmyk = rgbaToCmyk(color);
+
+			// Find the current preset for analytics
+			const currentPreset = presetSizes.find(
+				(preset) =>
+					preset.width === downloadOptions.width &&
+					preset.height === downloadOptions.height,
+			);
+
+			trackEvent("color_download", {
+				// Color information
+				color_hex: hex,
+				color_rgb: `rgb(${color.r}, ${color.g}, ${color.b})`,
+				color_rgba: `rgba(${color.r}, ${color.g}, ${color.b}, ${color.a})`,
+				color_hsl: `hsl(${hsl.h}, ${hsl.s}%, ${hsl.l}%)`,
+				color_hsla: `hsla(${hsl.h}, ${hsl.s}%, ${hsl.l}%, ${hsl.a})`,
+				color_cmyk: `cmyk(${cmyk.c}%, ${cmyk.m}%, ${cmyk.y}%, ${cmyk.k}%)`,
+
+				// Color components for analysis
+				red: color.r,
+				green: color.g,
+				blue: color.b,
+				alpha: color.a,
+				hue: hsl.h,
+				saturation: hsl.s,
+				lightness: hsl.l,
+
+				// Download settings
+				format: downloadOptions.format,
+				width: downloadOptions.width,
+				height: downloadOptions.height,
+				quality: downloadOptions.quality || null,
+				preset: currentPreset?.label || "Custom",
+
+				// Additional metrics
+				image_size: `${downloadOptions.width}x${downloadOptions.height}`,
+				total_pixels: downloadOptions.width * downloadOptions.height,
+				aspect_ratio: (downloadOptions.width / downloadOptions.height).toFixed(
+					2,
+				),
+
+				// Color categories for analysis
+				is_grayscale: color.r === color.g && color.g === color.b,
+				has_transparency: color.a < 1,
+				brightness: Math.round(
+					(color.r * 299 + color.g * 587 + color.b * 114) / 1000,
+				),
+			});
+
 			await downloadColorImage(color, downloadOptions);
 		} catch (err) {
+			// Track download errors
+			trackEvent("color_download_error", {
+				error_message: err instanceof Error ? err.message : "Download failed",
+				format: downloadOptions.format,
+				width: downloadOptions.width,
+				height: downloadOptions.height,
+			});
+
 			setError(err instanceof Error ? err.message : "Download failed");
 		} finally {
 			setIsDownloading(false);

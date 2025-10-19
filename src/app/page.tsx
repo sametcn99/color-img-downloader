@@ -38,7 +38,6 @@ export default function Home() {
 			<Paper
 				elevation={0}
 				sx={{
-					background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
 					color: "white",
 					p: { xs: 3, md: 4 },
 					mb: 4,
@@ -115,7 +114,6 @@ export default function Home() {
 										p: 2,
 										width: "100%",
 										borderRadius: 2,
-										bgcolor: "grey.50",
 									}}
 								>
 									<Typography
@@ -166,8 +164,8 @@ export default function Home() {
 						</Card>
 
 						{/* Color Sliders */}
-						<Card elevation={2} sx={{ borderRadius: 3 }}>
-							<CardContent sx={{ p: 3 }}>
+						<Card elevation={2} sx={{ borderRadius: 3, height: "100%" }}>
+							<CardContent sx={{ p: 3, height: "100%" }}>
 								<Typography variant="h6" fontWeight="600" gutterBottom>
 									Visual Sliders
 								</Typography>
@@ -189,7 +187,6 @@ export default function Home() {
 						elevation={3}
 						sx={{
 							borderRadius: 3,
-							background: "linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%)",
 						}}
 					>
 						<CardContent sx={{ p: 4 }}>

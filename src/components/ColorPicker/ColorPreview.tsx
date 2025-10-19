@@ -32,6 +32,8 @@ export const ColorPreview: React.FC<ColorPreviewProps> = ({
 				p: 3,
 				textAlign: "center",
 				minWidth: 300,
+				width: "100%",
+				height: "100%",
 			}}
 		>
 			<Typography variant="h6" gutterBottom>
