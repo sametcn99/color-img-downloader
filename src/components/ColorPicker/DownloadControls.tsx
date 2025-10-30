@@ -1,28 +1,40 @@
 "use client";
 
-import { Download as DownloadIcon } from "@mui/icons-material";
+// cSpell:ignore Umami
+
+import {
+	ContentCopy as ContentCopyIcon,
+	Download as DownloadIcon,
+} from "@mui/icons-material";
 import {
 	Alert,
 	Button,
+	Checkbox,
 	CircularProgress,
 	FormControl,
+	FormControlLabel,
+	IconButton,
+	InputAdornment,
 	InputLabel,
 	MenuItem,
 	Paper,
 	Select,
 	Stack,
 	TextField,
+	Tooltip,
 	Typography,
 } from "@mui/material";
 import type React from "react";
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useUmami } from "../../hooks/useUmami";
 import type {
+	ColorFormat,
 	DownloadOptions,
 	ImageFormat,
 	RGBAColor,
 } from "../../types/color";
 import {
+	formatColorString,
 	rgbaToCmyk,
 	rgbaToHex,
 	rgbaToHsla,
@@ -36,17 +48,35 @@ interface DownloadControlsProps {
 	color: RGBAColor;
 }
 
+const SHARE_FORMAT_LABELS: Record<ColorFormat, string> = {
+	hex: "HEX",
+	rgb: "RGB",
+	rgba: "RGBA",
+	hsl: "HSL",
+	hsla: "HSLA",
+	hsv: "HSV",
+	hsva: "HSVA",
+	cmyk: "CMYK",
+	lab: "LAB",
+	hwb: "HWB",
+	lch: "LCH",
+};
+
 export const DownloadControls: React.FC<DownloadControlsProps> = ({
 	color,
 }) => {
 	const [downloadOptions, setDownloadOptions] = useState<DownloadOptions>(
 		getDefaultDownloadOptions(),
 	);
+	const [shareFormat, setShareFormat] = useState<ColorFormat>("hex");
+	const [shareDownload, setShareDownload] = useState(false);
+	const [shareBaseUrl, setShareBaseUrl] = useState("");
+	const [isShareCopied, setIsShareCopied] = useState(false);
 	const [isDownloading, setIsDownloading] = useState(false);
 	const [error, setError] = useState<string | null>(null);
 	const { trackEvent } = useUmami();
 
-	// Önceden tanımlanmış boyutlar
+	// Predefined sizes
 	const presetSizes = [
 		{ label: "Custom", width: 0, height: 0 },
 		{ label: "Instagram Post (1080×1080)", width: 1080, height: 1080 },
@@ -177,6 +207,74 @@ export const DownloadControls: React.FC<DownloadControlsProps> = ({
 		}
 	};
 
+	useEffect(() => {
+		if (typeof window !== "undefined") {
+			setShareBaseUrl(`${window.location.origin}${window.location.pathname}`);
+		}
+	}, []);
+
+	const shareFormatValue = useMemo(() => {
+		const formatted = formatColorString(color, shareFormat);
+		return shareFormat === "hex" ? formatted.toUpperCase() : formatted;
+	}, [color, shareFormat]);
+
+	const shareUrl = useMemo(() => {
+		const params = new URLSearchParams();
+		params.set("format", shareFormat);
+		params.set("formatValue", shareFormatValue);
+		params.set("size", `${downloadOptions.width}x${downloadOptions.height}`);
+		params.set("download", shareDownload ? "true" : "false");
+		params.set("extension", downloadOptions.format);
+
+		const query = params.toString();
+		if (!query) {
+			return shareBaseUrl;
+		}
+		if (shareBaseUrl) {
+			return `${shareBaseUrl}?${query}`;
+		}
+		return `?${query}`;
+	}, [
+		downloadOptions.format,
+		downloadOptions.height,
+		downloadOptions.width,
+		shareBaseUrl,
+		shareDownload,
+		shareFormat,
+		shareFormatValue,
+	]);
+
+	useEffect(() => {
+		if (!shareUrl) {
+			return;
+		}
+		setIsShareCopied(false);
+	}, [shareUrl]);
+
+	const handleShareCopy = async () => {
+		try {
+			if (!shareUrl) return;
+
+			if (navigator.clipboard?.writeText) {
+				await navigator.clipboard.writeText(shareUrl);
+			} else {
+				const textarea = document.createElement("textarea");
+				textarea.value = shareUrl;
+				textarea.style.position = "fixed";
+				textarea.style.opacity = "0";
+				document.body.appendChild(textarea);
+				textarea.focus();
+				textarea.select();
+				document.execCommand("copy");
+				document.body.removeChild(textarea);
+			}
+
+			setIsShareCopied(true);
+		} catch (copyError) {
+			console.error("Failed to copy share URL:", copyError);
+		}
+	};
+
 	const formatLabels: Record<ImageFormat, string> = {
 		png: "PNG (with transparency)",
 		jpeg: "JPEG (no transparency)",
@@ -285,6 +383,75 @@ export const DownloadControls: React.FC<DownloadControlsProps> = ({
 						downloadOptions.quality &&
 						` • Quality: ${Math.round(downloadOptions.quality * 100)}%`}
 				</Typography>
+
+				<Stack spacing={1.5}>
+					<FormControl fullWidth>
+						<InputLabel>Color Format</InputLabel>
+						<Select
+							value={shareFormat}
+							label="Color Format"
+							onChange={(event) =>
+								setShareFormat(event.target.value as ColorFormat)
+							}
+						>
+							{Object.entries(SHARE_FORMAT_LABELS).map(([value, label]) => (
+								<MenuItem key={value} value={value}>
+									{label}
+								</MenuItem>
+							))}
+						</Select>
+					</FormControl>
+					<TextField
+						label="Format value"
+						value={shareFormatValue}
+						InputProps={{ readOnly: true }}
+						inputProps={{ style: { fontFamily: "monospace" } }}
+						helperText="Auto-updated from the selected color format"
+						fullWidth
+					/>
+					<FormControlLabel
+						control={
+							<Checkbox
+								checked={shareDownload}
+								onChange={(event) => setShareDownload(event.target.checked)}
+							/>
+						}
+						label="Start download automatically when the link is opened"
+					/>
+
+					<TextField
+						label="Shareable link with search parameters"
+						value={shareUrl}
+						InputProps={{
+							readOnly: true,
+							endAdornment: (
+								<InputAdornment position="end">
+									<Tooltip
+										title={isShareCopied ? "Copied!" : "Copy to clipboard"}
+									>
+										<span>
+											<IconButton
+												onClick={handleShareCopy}
+												size="small"
+												edge="end"
+												disabled={!shareUrl}
+											>
+												<ContentCopyIcon fontSize="small" />
+											</IconButton>
+										</span>
+									</Tooltip>
+								</InputAdornment>
+							),
+						}}
+						placeholder="Link will appear here"
+						fullWidth
+					/>
+					<Typography variant="caption" color="text.secondary">
+						Share or bookmark this link to reopen Color Studio with the current
+						color and export settings. Leave the checkbox unchecked to preview
+						the color before downloading.
+					</Typography>
+				</Stack>
 			</Stack>
 		</Paper>
 	);

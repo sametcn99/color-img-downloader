@@ -5,6 +5,8 @@
 ![TypeScript](https://img.shields.io/badge/TypeScript-5.x-blue?logo=typescript)
 ![Material-UI](https://img.shields.io/badge/Material--UI-7.2.0-blue?logo=mui)
 
+[Live Demo](https://color-img-downloader.sametcc.me/) | [Github Repository](https://sametcc.me/repo/color-img-downloader)
+
 **Color Studio** is a professional-grade color picker and image generation tool built with modern web technologies. Create, manipulate, and export beautiful colors in multiple formats with an intuitive and powerful interface.
 
 ## ✨ Features
@@ -162,6 +164,24 @@ src/
 1. Pick your brand colors
 2. Select social media preset (Instagram, Facebook, etc.)
 3. Download ready-to-use images for your posts
+
+### **URL Search Parameters**
+
+Color Studio can be deep-linked and automated by adding query parameters to the page URL. The following keys are supported:
+
+- `format` — Any color notation supported by the app (`hex`, `rgb`, `rgba`, `hsl`, `hsla`, `hsv`, `hsva`, `cmyk`, `lab`, `hwb`, `lch`).
+- `formatValue` — The value for the selected format, written exactly as it would appear in the UI (for example `#ff5733`, `255,87,34`, `0,66,87,0`).
+- `size` — Optional image dimensions in `widthxheight` form (such as `1280x720`). Defaults to the standard export size when omitted.
+- `download` — `true` triggers an immediate download, while `false` renders a minimal preview page.
+- `extension` — Target file format: `png`, `jpeg`, or `svg`. The alias `jpg` is also accepted for JPEG.
+
+**Preview example**  
+`?format=hex&formatValue=ff5733&size=1280x720&download=false&extension=png`
+
+**Direct download example**  
+`?format=rgba&formatValue=255,87,34,1&size=512x512&download=true&extension=svg`
+
+Leave every parameter unset to use Color Studio in its interactive default mode.
 
 ## 🛠 **Development**
 

@@ -55,7 +55,7 @@ export const ColorWheelModal: React.FC<ColorWheelModalProps> = ({
 
 	return (
 		<>
-			{/* Küçük Color Wheel - Modal açmak için */}
+			{/* Compact color wheel - opens modal */}
 			<Box
 				sx={{
 					position: "relative",
@@ -66,7 +66,7 @@ export const ColorWheelModal: React.FC<ColorWheelModalProps> = ({
 			>
 				<ColorWheel color={color} onColorChange={onColorChange} size={size} />
 
-				{/* Genişletme butonu */}
+				{/* Expand button */}
 				<Tooltip title="Open in full size">
 					<IconButton
 						onClick={handleOpenModal}

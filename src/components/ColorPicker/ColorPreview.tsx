@@ -1,15 +1,42 @@
 "use client";
 
-import { Box, Chip, Paper, Stack, Typography } from "@mui/material";
+import { Box, Chip, Paper, Stack, Tooltip, Typography } from "@mui/material";
 import type React from "react";
-import type { RGBAColor } from "../../types/color";
+import { useEffect, useMemo, useRef, useState } from "react";
+import type { ColorFormat, RGBAColor } from "../../types/color";
 import {
 	formatColorString,
 	rgbaToHex,
-	rgbaToHsla,
-	rgbaToHsva,
 	rgbaToString,
 } from "../../utils/colorConversions";
+
+const SUPPORTED_FORMATS: ColorFormat[] = [
+	"hex",
+	"rgb",
+	"rgba",
+	"hsl",
+	"hsla",
+	"hsv",
+	"hsva",
+	"cmyk",
+	"lab",
+	"hwb",
+	"lch",
+];
+
+const FORMAT_LABELS: Record<ColorFormat, string> = {
+	hex: "HEX",
+	rgb: "RGB",
+	rgba: "RGBA",
+	hsl: "HSL",
+	hsla: "HSLA",
+	hsv: "HSV",
+	hsva: "HSVA",
+	cmyk: "CMYK",
+	lab: "LAB",
+	hwb: "HWB",
+	lch: "LCH",
+};
 
 interface ColorPreviewProps {
 	color: RGBAColor;
@@ -22,8 +49,58 @@ export const ColorPreview: React.FC<ColorPreviewProps> = ({
 }) => {
 	const colorString = rgbaToString(color);
 	const hexString = rgbaToHex(color);
-	const hsl = rgbaToHsla(color);
-	const hsv = rgbaToHsva(color);
+
+	const formatValues = useMemo(
+		() =>
+			SUPPORTED_FORMATS.map((format) => {
+				const rawValue = formatColorString(color, format);
+				return {
+					format,
+					label: FORMAT_LABELS[format],
+					value: format === "hex" ? rawValue.toUpperCase() : rawValue,
+				};
+			}),
+		[color],
+	);
+
+	const [copiedFormat, setCopiedFormat] = useState<ColorFormat | null>(null);
+	const copyTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+	useEffect(() => {
+		return () => {
+			if (copyTimeoutRef.current) {
+				clearTimeout(copyTimeoutRef.current);
+			}
+		};
+	}, []);
+
+	const copyToClipboard = async (format: ColorFormat, value: string) => {
+		try {
+			if (navigator.clipboard?.writeText) {
+				await navigator.clipboard.writeText(value);
+			} else {
+				const textarea = document.createElement("textarea");
+				textarea.value = value;
+				textarea.style.position = "fixed";
+				textarea.style.opacity = "0";
+				document.body.appendChild(textarea);
+				textarea.focus();
+				textarea.select();
+				document.execCommand("copy");
+				document.body.removeChild(textarea);
+			}
+
+			setCopiedFormat(format);
+			if (copyTimeoutRef.current) {
+				clearTimeout(copyTimeoutRef.current);
+			}
+			copyTimeoutRef.current = setTimeout(() => {
+				setCopiedFormat(null);
+			}, 2000);
+		} catch (error) {
+			console.error("Failed to copy color value:", error);
+		}
+	};
 
 	return (
 		<Paper
@@ -83,49 +160,37 @@ export const ColorPreview: React.FC<ColorPreviewProps> = ({
 			<Stack spacing={2}>
 				<Box>
 					<Typography variant="body2" color="text.secondary" gutterBottom>
-						Primary Formats
+						Supported Formats
 					</Typography>
-					<Stack spacing={1}>
-						<Chip
-							label={`HEX: ${hexString}`}
-							size="small"
-							variant="outlined"
-							sx={{ fontFamily: "monospace" }}
-						/>
-						<Chip
-							label={`RGB: ${formatColorString(color, "rgb")}`}
-							size="small"
-							variant="outlined"
-							sx={{ fontFamily: "monospace" }}
-						/>
-						{color.a < 1 && (
-							<Chip
-								label={`RGBA: ${colorString}`}
-								size="small"
-								variant="outlined"
-								sx={{ fontFamily: "monospace" }}
-							/>
-						)}
-					</Stack>
-				</Box>
-
-				<Box>
-					<Typography variant="body2" color="text.secondary" gutterBottom>
-						Alternative Formats
-					</Typography>
-					<Stack spacing={1}>
-						<Chip
-							label={`HSL: hsl(${hsl.h}, ${hsl.s}%, ${hsl.l}%)`}
-							size="small"
-							variant="outlined"
-							sx={{ fontFamily: "monospace" }}
-						/>
-						<Chip
-							label={`HSV: hsv(${hsv.h}, ${hsv.s}%, ${hsv.v}%)`}
-							size="small"
-							variant="outlined"
-							sx={{ fontFamily: "monospace" }}
-						/>
+					<Stack
+						direction="row"
+						spacing={1}
+						rowGap={1}
+						flexWrap="wrap"
+						useFlexGap
+					>
+						{formatValues.map(({ format, label, value }) => (
+							<Tooltip
+								key={format}
+								title={
+									copiedFormat === format
+										? "Copied!"
+										: "Click to copy to clipboard"
+								}
+							>
+								<Chip
+									label={`${label}: ${value}`}
+									size="small"
+									variant={copiedFormat === format ? "filled" : "outlined"}
+									onClick={() => copyToClipboard(format, value)}
+									sx={{
+										fontFamily: "monospace",
+										cursor: "pointer",
+										userSelect: "none",
+									}}
+								/>
+							</Tooltip>
+						))}
 					</Stack>
 				</Box>
 

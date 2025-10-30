@@ -21,7 +21,7 @@ export const ColorWheel: React.FC<ColorWheelProps> = ({
 	const [isDragging, setIsDragging] = useState(false);
 	const [hsla, setHsla] = useState<HSLAColor>(rgbaToHsla(color));
 
-	// Canvas çizim fonksiyonu
+	// Canvas drawing function
 	const drawColorWheel = useCallback(() => {
 		const canvas = canvasRef.current;
 		if (!canvas) return;
@@ -33,15 +33,15 @@ export const ColorWheel: React.FC<ColorWheelProps> = ({
 		const centerY = size / 2;
 		const radius = size / 2 - 10;
 
-		// Canvas temizle
+		// Clear the canvas
 		ctx.clearRect(0, 0, size, size);
 
-		// Renk tekerleğini çiz
+		// Draw the color wheel
 		for (let angle = 0; angle < 360; angle++) {
 			const startAngle = ((angle - 1) * Math.PI) / 180;
 			const endAngle = (angle * Math.PI) / 180;
 
-			// Dış daire (doygunluk %100)
+			// Outer circle (100% saturation)
 			for (let r = 0; r < radius; r += 1) {
 				const saturation = (r / radius) * 100;
 				const hsl = `hsl(${angle}, ${saturation}%, 50%)`;
@@ -55,7 +55,7 @@ export const ColorWheel: React.FC<ColorWheelProps> = ({
 		}
 	}, [size]);
 
-	// Mouse koordinatlarından HSL değerlerini hesapla
+	// Calculate HSL values from mouse coordinates
 	const getHSLFromMousePosition = useCallback(
 		(clientX: number, clientY: number) => {
 			const canvas = canvasRef.current;
@@ -72,24 +72,24 @@ export const ColorWheel: React.FC<ColorWheelProps> = ({
 			const distance = Math.sqrt(x * x + y * y);
 			if (distance > maxRadius) return null;
 
-			// Açıyı hesapla (0-360)
+			// Calculate angle (0-360)
 			let angle = (Math.atan2(y, x) * 180) / Math.PI;
 			if (angle < 0) angle += 360;
 
-			// Doygunluğu hesapla (0-100)
+			// Calculate saturation (0-100)
 			const saturation = Math.min((distance / maxRadius) * 100, 100);
 
 			return {
 				h: Math.round(angle),
 				s: Math.round(saturation),
-				l: 50, // Sabit aydınlık
+				l: 50, // Fixed lightness
 				a: hsla.a,
 			};
 		},
 		[size, hsla.a],
 	);
 
-	// Mouse olayları
+	// Mouse events
 	const handleMouseDown = (event: React.MouseEvent<HTMLCanvasElement>) => {
 		setIsDragging(true);
 		handleMouseMove(event);
@@ -113,7 +113,7 @@ export const ColorWheel: React.FC<ColorWheelProps> = ({
 		setIsDragging(false);
 	};
 
-	// Touch olayları (mobil destek)
+	// Touch events (mobile support)
 	const handleTouchStart = (event: React.TouchEvent<HTMLCanvasElement>) => {
 		event.preventDefault();
 		setIsDragging(true);
@@ -146,7 +146,7 @@ export const ColorWheel: React.FC<ColorWheelProps> = ({
 		setIsDragging(false);
 	};
 
-	// Seçili rengin pozisyonunu çiz
+	// Draw selected color position
 	const drawColorIndicator = useCallback(() => {
 		const canvas = canvasRef.current;
 		if (!canvas) return;
@@ -158,14 +158,14 @@ export const ColorWheel: React.FC<ColorWheelProps> = ({
 		const centerY = size / 2;
 		const maxRadius = size / 2 - 10;
 
-		// HSL değerlerinden pozisyon hesapla
+		// Compute position from HSL values
 		const angle = (hsla.h * Math.PI) / 180;
 		const radius = (hsla.s / 100) * maxRadius;
 
 		const x = centerX + Math.cos(angle) * radius;
 		const y = centerY + Math.sin(angle) * radius;
 
-		// İndikatör çiz
+		// Draw indicator
 		ctx.beginPath();
 		ctx.arc(x, y, 8, 0, 2 * Math.PI);
 		ctx.strokeStyle = "#000";
@@ -179,18 +179,18 @@ export const ColorWheel: React.FC<ColorWheelProps> = ({
 		ctx.stroke();
 	}, [hsla, size]);
 
-	// Canvas'ı çiz
+	// Draw the canvas
 	useEffect(() => {
 		drawColorWheel();
 		drawColorIndicator();
 	}, [drawColorWheel, drawColorIndicator]);
 
-	// Prop'tan gelen renk değiştiğinde HSL'yi güncelle
+	// Update HSL when incoming color prop changes
 	useEffect(() => {
 		setHsla(rgbaToHsla(color));
 	}, [color]);
 
-	// Global mouse olayları (dragging sırasında)
+	// Global mouse events (while dragging)
 	useEffect(() => {
 		if (!isDragging) return;
 
