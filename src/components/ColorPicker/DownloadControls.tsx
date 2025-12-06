@@ -3,14 +3,22 @@
 // cSpell:ignore Umami
 
 import {
+	Check as CheckIcon,
 	ContentCopy as ContentCopyIcon,
 	Download as DownloadIcon,
+	ExpandMore as ExpandMoreIcon,
+	Share as ShareIcon,
 } from "@mui/icons-material";
 import {
+	Accordion,
+	AccordionDetails,
+	AccordionSummary,
 	Alert,
+	Box,
 	Button,
 	Checkbox,
 	CircularProgress,
+	Divider,
 	FormControl,
 	FormControlLabel,
 	IconButton,
@@ -19,8 +27,11 @@ import {
 	MenuItem,
 	Paper,
 	Select,
+	Slider,
 	Stack,
 	TextField,
+	ToggleButton,
+	ToggleButtonGroup,
 	Tooltip,
 	Typography,
 } from "@mui/material";
@@ -79,17 +90,17 @@ export const DownloadControls: React.FC<DownloadControlsProps> = ({
 	// Predefined sizes
 	const presetSizes = [
 		{ label: "Custom", width: 0, height: 0 },
-		{ label: "Instagram Post (1080×1080)", width: 1080, height: 1080 },
-		{ label: "Instagram Story (1080×1920)", width: 1080, height: 1920 },
-		{ label: "Facebook Post (1200×630)", width: 1200, height: 630 },
-		{ label: "Twitter Header (1500×500)", width: 1500, height: 500 },
-		{ label: "LinkedIn Banner (1584×396)", width: 1584, height: 396 },
-		{ label: "YouTube Thumbnail (1280×720)", width: 1280, height: 720 },
-		{ label: "Desktop Wallpaper (1920×1080)", width: 1920, height: 1080 },
-		{ label: "Mobile Wallpaper (1080×1920)", width: 1080, height: 1920 },
-		{ label: "Square Small (512×512)", width: 512, height: 512 },
-		{ label: "Square Medium (1024×1024)", width: 1024, height: 1024 },
-		{ label: "Square Large (2048×2048)", width: 2048, height: 2048 },
+		{ label: "Instagram Post", width: 1080, height: 1080 },
+		{ label: "Instagram Story", width: 1080, height: 1920 },
+		{ label: "Facebook Post", width: 1200, height: 630 },
+		{ label: "Twitter Header", width: 1500, height: 500 },
+		{ label: "LinkedIn Banner", width: 1584, height: 396 },
+		{ label: "YouTube Thumbnail", width: 1280, height: 720 },
+		{ label: "Desktop Wallpaper", width: 1920, height: 1080 },
+		{ label: "Mobile Wallpaper", width: 1080, height: 1920 },
+		{ label: "Square Small", width: 512, height: 512 },
+		{ label: "Square Medium", width: 1024, height: 1024 },
+		{ label: "Square Large", width: 2048, height: 2048 },
 	];
 
 	const getCurrentPreset = () => {
@@ -112,25 +123,29 @@ export const DownloadControls: React.FC<DownloadControlsProps> = ({
 		}
 	};
 
-	const handleFormatChange = (format: ImageFormat) => {
-		setDownloadOptions((prev) => ({ ...prev, format }));
+	const handleFormatChange = (
+		event: React.MouseEvent<HTMLElement>,
+		newFormat: ImageFormat | null,
+	) => {
+		if (newFormat !== null) {
+			setDownloadOptions((prev) => ({ ...prev, format: newFormat }));
+		}
 	};
 
 	const handleSizeChange =
 		(dimension: "width" | "height") =>
-		(event: React.ChangeEvent<HTMLInputElement>) => {
-			const value = parseInt(event.target.value, 10) || 0;
-			setDownloadOptions((prev) => ({
-				...prev,
-				[dimension]: Math.max(1, value),
-			}));
-		};
+			(event: React.ChangeEvent<HTMLInputElement>) => {
+				const value = parseInt(event.target.value, 10) || 0;
+				setDownloadOptions((prev) => ({
+					...prev,
+					[dimension]: Math.max(1, value),
+				}));
+			};
 
-	const handleQualityChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-		const value = parseFloat(event.target.value) || 0;
+	const handleQualityChange = (event: Event, newValue: number | number[]) => {
 		setDownloadOptions((prev) => ({
 			...prev,
-			quality: Math.max(0.1, Math.min(1, value)),
+			quality: (newValue as number) / 100,
 		}));
 	};
 
@@ -275,184 +290,328 @@ export const DownloadControls: React.FC<DownloadControlsProps> = ({
 		}
 	};
 
-	const formatLabels: Record<ImageFormat, string> = {
-		png: "PNG (with transparency)",
-		jpeg: "JPEG (no transparency)",
-		svg: "SVG (vector format)",
-	};
-
 	return (
-		<Paper elevation={1} sx={{ p: 3 }}>
-			<Typography variant="h6" gutterBottom>
-				Download Settings
-			</Typography>
-
-			<Stack spacing={3}>
-				<FormControl fullWidth>
-					<InputLabel>Format</InputLabel>
-					<Select
-						value={downloadOptions.format}
-						label="Format"
-						onChange={(e) => handleFormatChange(e.target.value as ImageFormat)}
-					>
-						{Object.entries(formatLabels).map(([format, label]) => (
-							<MenuItem key={format} value={format}>
-								{label}
-							</MenuItem>
-						))}
-					</Select>
-				</FormControl>
-
-				<FormControl fullWidth>
-					<InputLabel>Preset Size</InputLabel>
-					<Select
-						value={getCurrentPreset()}
-						label="Preset Size"
-						onChange={(e) => handlePresetChange(e.target.value)}
-						MenuProps={{
-							PaperProps: {
-								style: {
-									maxHeight: 250,
+		<Paper
+			elevation={0}
+			variant="outlined"
+			sx={{ borderRadius: 3, overflow: "hidden" }}
+		>
+			<Box sx={{ p: 3, pb: 2 }}>
+				<Stack spacing={4}>
+					{/* Format Selection */}
+					<Box>
+						<Typography
+							variant="subtitle2"
+							color="text.secondary"
+							gutterBottom
+							sx={{ fontWeight: 600, mb: 1 }}
+						>
+							FILE FORMAT
+						</Typography>
+						<ToggleButtonGroup
+							value={downloadOptions.format}
+							exclusive
+							onChange={handleFormatChange}
+							fullWidth
+							size="large"
+							sx={{
+								display: "flex",
+								gap: 2,
+								"& .MuiToggleButton-root": {
+									border: "1px solid",
+									borderColor: "divider",
+									borderRadius: "12px !important",
+									flex: 1,
+									textTransform: "none",
+									py: 1.5,
+									color: "text.secondary",
+									"&.Mui-selected": {
+										color: "primary.main",
+										backgroundColor: "primary.lighter",
+										borderColor: "primary.main",
+										"&:hover": {
+											backgroundColor: "primary.lighter",
+										},
+									},
 								},
-							},
-						}}
-					>
-						{presetSizes.map((preset) => (
-							<MenuItem key={preset.label} value={preset.label}>
-								{preset.label}
-							</MenuItem>
-						))}
-					</Select>
-				</FormControl>
+							}}
+						>
+							<ToggleButton value="png">
+								<Stack alignItems="center">
+									<Typography fontWeight={600}>PNG</Typography>
+									<Typography variant="caption" sx={{ fontSize: "0.7rem" }}>
+										Transparent
+									</Typography>
+								</Stack>
+							</ToggleButton>
+							<ToggleButton value="jpeg">
+								<Stack alignItems="center">
+									<Typography fontWeight={600}>JPEG</Typography>
+									<Typography variant="caption" sx={{ fontSize: "0.7rem" }}>
+										Compact
+									</Typography>
+								</Stack>
+							</ToggleButton>
+							<ToggleButton value="svg">
+								<Stack alignItems="center">
+									<Typography fontWeight={600}>SVG</Typography>
+									<Typography variant="caption" sx={{ fontSize: "0.7rem" }}>
+										Vector
+									</Typography>
+								</Stack>
+							</ToggleButton>
+						</ToggleButtonGroup>
+					</Box>
 
-				<Stack direction="row" spacing={2}>
-					<TextField
-						label="Width"
-						type="number"
-						value={downloadOptions.width}
-						onChange={handleSizeChange("width")}
-						inputProps={{ min: 1, max: 4096 }}
-						sx={{ flex: 1 }}
-					/>
-					<TextField
-						label="Height"
-						type="number"
-						value={downloadOptions.height}
-						onChange={handleSizeChange("height")}
-						inputProps={{ min: 1, max: 4096 }}
-						sx={{ flex: 1 }}
-					/>
+					{/* Size Selection */}
+					<Box>
+						<Stack
+							direction="row"
+							justifyContent="space-between"
+							alignItems="center"
+							mb={1}
+						>
+							<Typography
+								variant="subtitle2"
+								color="text.secondary"
+								sx={{ fontWeight: 600 }}
+							>
+								DIMENSIONS
+							</Typography>
+						</Stack>
+
+						<Stack spacing={2}>
+							<FormControl fullWidth size="small">
+								<InputLabel>Preset</InputLabel>
+								<Select
+									value={getCurrentPreset()}
+									label="Preset"
+									onChange={(e) => handlePresetChange(e.target.value)}
+									sx={{ borderRadius: 2 }}
+								>
+									{presetSizes.map((preset) => (
+										<MenuItem key={preset.label} value={preset.label}>
+											{preset.label}
+											{preset.label !== "Custom" && (
+												<Typography
+													variant="caption"
+													color="text.secondary"
+													sx={{ ml: 1 }}
+												>
+													({preset.width}×{preset.height})
+												</Typography>
+											)}
+										</MenuItem>
+									))}
+								</Select>
+							</FormControl>
+
+							<Stack direction="row" spacing={2}>
+								<TextField
+									label="Width"
+									type="number"
+									value={downloadOptions.width}
+									onChange={handleSizeChange("width")}
+									inputProps={{ min: 1, max: 4096 }}
+									sx={{ flex: 1 }}
+									size="small"
+									InputProps={{
+										endAdornment: (
+											<InputAdornment position="end">px</InputAdornment>
+										),
+									}}
+								/>
+								<TextField
+									label="Height"
+									type="number"
+									value={downloadOptions.height}
+									onChange={handleSizeChange("height")}
+									inputProps={{ min: 1, max: 4096 }}
+									sx={{ flex: 1 }}
+									size="small"
+									InputProps={{
+										endAdornment: (
+											<InputAdornment position="end">px</InputAdornment>
+										),
+									}}
+								/>
+							</Stack>
+						</Stack>
+					</Box>
+
+					{/* Quality Slider (JPEG only) */}
+					{downloadOptions.format === "jpeg" && (
+						<Box>
+							<Stack direction="row" justifyContent="space-between" mb={0.5}>
+								<Typography
+									variant="subtitle2"
+									color="text.secondary"
+									sx={{ fontWeight: 600 }}
+								>
+									QUALITY
+								</Typography>
+								<Typography variant="caption" fontWeight="bold" color="primary">
+									{Math.round((downloadOptions.quality || 0.9) * 100)}%
+								</Typography>
+							</Stack>
+							<Slider
+								value={(downloadOptions.quality || 0.9) * 100}
+								onChange={handleQualityChange}
+								min={10}
+								max={100}
+								step={5}
+								valueLabelDisplay="auto"
+								size="medium"
+							/>
+						</Box>
+					)}
 				</Stack>
+			</Box>
 
-				{downloadOptions.format === "jpeg" && (
-					<TextField
-						label="Quality"
-						type="number"
-						value={downloadOptions.quality}
-						onChange={handleQualityChange}
-						inputProps={{ min: 0.1, max: 1, step: 0.1 }}
-						helperText="Quality from 0.1 (lowest) to 1.0 (highest)"
-						fullWidth
-					/>
-				)}
+			{error && (
+				<Alert
+					severity="error"
+					sx={{ mx: 3, mb: 2 }}
+					onClose={() => setError(null)}
+				>
+					{error}
+				</Alert>
+			)}
 
-				{error && (
-					<Alert severity="error" onClose={() => setError(null)}>
-						{error}
-					</Alert>
-				)}
-
+			<Box sx={{ p: 3, pt: 0 }}>
 				<Button
 					variant="contained"
 					onClick={handleDownload}
 					disabled={isDownloading}
 					startIcon={
-						isDownloading ? <CircularProgress size={20} /> : <DownloadIcon />
+						isDownloading ? (
+							<CircularProgress size={20} color="inherit" />
+						) : (
+							<DownloadIcon />
+						)
 					}
 					fullWidth
 					size="large"
+					sx={{
+						py: 1.5,
+						borderRadius: 2,
+						fontSize: "1rem",
+						fontWeight: 600,
+						boxShadow: "0 8px 16px rgba(0,0,0,0.1)",
+						"&:hover": {
+							boxShadow: "0 12px 20px rgba(0,0,0,0.15)",
+							transform: "translateY(-1px)",
+						},
+						transition: "all 0.2s",
+					}}
 				>
 					{isDownloading
-						? "Generating..."
+						? "Generating File..."
 						: `Download ${downloadOptions.format.toUpperCase()}`}
 				</Button>
-
-				<Typography variant="body2" color="text.secondary" textAlign="center">
+				<Typography
+					variant="caption"
+					display="block"
+					textAlign="center"
+					color="text.secondary"
+					sx={{ mt: 1 }}
+				>
 					{downloadOptions.width} × {downloadOptions.height} pixels
 					{downloadOptions.format === "jpeg" &&
-						downloadOptions.quality &&
-						` • Quality: ${Math.round(downloadOptions.quality * 100)}%`}
+						` • ${Math.round((downloadOptions.quality || 0.9) * 100)}% Quality`}
 				</Typography>
+			</Box>
 
-				<Stack spacing={1.5}>
-					<FormControl fullWidth>
-						<InputLabel>Color Format</InputLabel>
-						<Select
-							value={shareFormat}
-							label="Color Format"
-							onChange={(event) =>
-								setShareFormat(event.target.value as ColorFormat)
-							}
-						>
-							{Object.entries(SHARE_FORMAT_LABELS).map(([value, label]) => (
-								<MenuItem key={value} value={value}>
-									{label}
-								</MenuItem>
-							))}
-						</Select>
-					</FormControl>
-					<TextField
-						label="Format value"
-						value={shareFormatValue}
-						InputProps={{ readOnly: true }}
-						inputProps={{ style: { fontFamily: "monospace" } }}
-						helperText="Auto-updated from the selected color format"
-						fullWidth
-					/>
-					<FormControlLabel
-						control={
-							<Checkbox
-								checked={shareDownload}
-								onChange={(event) => setShareDownload(event.target.checked)}
+			<Divider />
+
+			{/* Share Section */}
+			<Accordion
+				elevation={0}
+				disableGutters
+				sx={{ "&:before": { display: "none" } }}
+			>
+				<AccordionSummary expandIcon={<ExpandMoreIcon />} sx={{ px: 3 }}>
+					<Stack direction="row" spacing={1} alignItems="center">
+						<ShareIcon color="action" fontSize="small" />
+						<Typography variant="subtitle2">Share or Link to Config</Typography>
+					</Stack>
+				</AccordionSummary>
+				<AccordionDetails sx={{ px: 3, pb: 3, pt: 0 }}>
+					<Stack spacing={2}>
+						<Typography variant="body2" color="text.secondary">
+							Copy a link that opens this page with your current color and
+							download settings selected.
+						</Typography>
+
+						<Stack direction="row" spacing={2} alignItems="center">
+							<FormControl fullWidth size="small">
+								<InputLabel>Color Format</InputLabel>
+								<Select
+									value={shareFormat}
+									label="Color Format"
+									onChange={(event) =>
+										setShareFormat(event.target.value as ColorFormat)
+									}
+								>
+									{Object.entries(SHARE_FORMAT_LABELS).map(([value, label]) => (
+										<MenuItem key={value} value={value}>
+											{label}
+										</MenuItem>
+									))}
+								</Select>
+							</FormControl>
+
+							<FormControlLabel
+								control={
+									<Checkbox
+										checked={shareDownload}
+										onChange={(event) => setShareDownload(event.target.checked)}
+										size="small"
+									/>
+								}
+								label={<Typography variant="caption">Auto-Download</Typography>}
+								sx={{ mr: 0, whiteSpace: "nowrap" }}
 							/>
-						}
-						label="Start download automatically when the link is opened"
-					/>
+						</Stack>
 
-					<TextField
-						label="Shareable link with search parameters"
-						value={shareUrl}
-						InputProps={{
-							readOnly: true,
-							endAdornment: (
-								<InputAdornment position="end">
-									<Tooltip
-										title={isShareCopied ? "Copied!" : "Copy to clipboard"}
-									>
-										<span>
+						<TextField
+							fullWidth
+							variant="outlined"
+							size="small"
+							value={shareUrl}
+							InputProps={{
+								readOnly: true,
+								endAdornment: (
+									<InputAdornment position="end">
+										<Tooltip
+											title={isShareCopied ? "Copied!" : "Copy to clipboard"}
+											placement="top"
+										>
 											<IconButton
 												onClick={handleShareCopy}
-												size="small"
 												edge="end"
 												disabled={!shareUrl}
+												color={isShareCopied ? "success" : "default"}
 											>
-												<ContentCopyIcon fontSize="small" />
+												{isShareCopied ? (
+													<CheckIcon fontSize="small" />
+												) : (
+													<ContentCopyIcon fontSize="small" />
+												)}
 											</IconButton>
-										</span>
-									</Tooltip>
-								</InputAdornment>
-							),
-						}}
-						placeholder="Link will appear here"
-						fullWidth
-					/>
-					<Typography variant="caption" color="text.secondary">
-						Share or bookmark this link to reopen Color Studio with the current
-						color and export settings. Leave the checkbox unchecked to preview
-						the color before downloading.
-					</Typography>
-				</Stack>
-			</Stack>
+										</Tooltip>
+									</InputAdornment>
+								),
+							}}
+							sx={{
+								"& .MuiOutlinedInput-root": {
+									bgcolor: "action.hover",
+								},
+							}}
+						/>
+					</Stack>
+				</AccordionDetails>
+			</Accordion>
 		</Paper>
 	);
 };
