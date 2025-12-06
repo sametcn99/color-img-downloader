@@ -97,7 +97,7 @@ export function parseColorRequestFromSearchParams(
 			errors.push("`formatValue` parameter is required.");
 		} else {
 			parsedFormat = formatResult.format;
-			const colorResult = parseColorValue(parsedFormat, rawFormatValue);
+			const colorResult = parseColorValue(parsedFormat!, rawFormatValue);
 			if (!colorResult.valid) {
 				errors.push(colorResult.error);
 			} else {
@@ -354,7 +354,7 @@ function parseDownloadParam(
 function parseExtensionParam(
 	extensionParam: string | null,
 ):
-	| { valid: true; value: ImageFormat }
+	| { valid: true; value: ImageFormat | undefined }
 	| { valid: false; error: string; value: ImageFormat | undefined } {
 	if (!extensionParam) {
 		return { valid: true, value: undefined };

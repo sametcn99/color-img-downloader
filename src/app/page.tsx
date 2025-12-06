@@ -18,7 +18,7 @@ import {
 	Typography,
 } from "@mui/material";
 import { useSearchParams } from "next/navigation";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { Suspense, useEffect, useMemo, useRef, useState } from "react";
 import { ColorInputs } from "../components/ColorPicker/ColorInputs";
 import { ColorPreview } from "../components/ColorPicker/ColorPreview";
 import { ColorSliders } from "../components/ColorPicker/ColorSliders";
@@ -32,7 +32,7 @@ import {
 } from "../utils/imageGeneration";
 import { parseColorRequestFromSearchParams } from "../utils/searchParamParsers";
 
-export default function Home() {
+function HomeContent() {
 	const searchParams = useSearchParams();
 	const parsedRequest = useMemo(
 		() => parseColorRequestFromSearchParams(searchParams),
@@ -527,5 +527,13 @@ export default function Home() {
 				</DialogActions>
 			</Dialog>
 		</>
+	);
+}
+
+export default function Home() {
+	return (
+		<Suspense fallback={null}>
+			<HomeContent />
+		</Suspense>
 	);
 }
