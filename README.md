@@ -5,7 +5,7 @@
 ![TypeScript](https://img.shields.io/badge/TypeScript-5.x-blue?logo=typescript)
 ![Material-UI](https://img.shields.io/badge/Material--UI-7.2.0-blue?logo=mui)
 
-[Live Demo](https://color-img-downloader.sametcc.me/) | [Github Repository](https://sametcc.me/repo/color-img-downloader)
+[Live Demo](https://color-img-downloader.vercel.app) | [Github Repository](https://sametcc.me/repo/color-img-downloader)
 
 **Color Studio** is a professional-grade color picker and image generation tool built with modern web technologies. Create, manipulate, and export beautiful colors in multiple formats with an intuitive and powerful interface.
 
