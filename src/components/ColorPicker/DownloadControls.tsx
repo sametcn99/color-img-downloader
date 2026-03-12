@@ -90,6 +90,7 @@ export const DownloadControls: React.FC<DownloadControlsProps> = ({
 	// Predefined sizes
 	const presetSizes = [
 		{ label: "Custom", width: 0, height: 0 },
+		{ label: "1x1 Pixel", width: 1, height: 1 },
 		{ label: "Instagram Post", width: 1080, height: 1080 },
 		{ label: "Instagram Story", width: 1080, height: 1920 },
 		{ label: "Facebook Post", width: 1200, height: 630 },
