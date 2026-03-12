@@ -39,33 +39,63 @@ export default function RootLayout({
 			<body className={`${geistSans.variable} ${geistMono.variable}`}>
 				<Providers>
 					<CssBaseline />
-					{children}
 					<Box
-						component="footer"
 						sx={{
-							textAlign: "center",
-							padding: 2.5,
-							marginTop: "auto",
-							borderTop: "1px solid",
-							borderColor: "divider",
+							minHeight: "100vh",
+							display: "flex",
+							flexDirection: "column",
 						}}
 					>
-						<Link
-							href="https://sametcc.me/repo/color-img-downloader"
-							target="_blank"
-							rel="noopener noreferrer"
+						<Box component="div" sx={{ flex: 1 }}>
+							{children}
+						</Box>
+						<Box
+							component="footer"
 							sx={{
-								color: "primary.main",
-								textDecoration: "none",
-								fontWeight: 500,
-								fontSize: "14px",
-								"&:hover": {
-									textDecoration: "underline",
-								},
+								mt: { xs: 6, md: 8 },
+								px: { xs: 2.5, md: 4 },
+								pb: { xs: 3, md: 4 },
 							}}
 						>
-							📋 Source Code
-						</Link>
+							<Box
+								sx={{
+									maxWidth: 1280,
+									mx: "auto",
+									px: { xs: 2.5, md: 3 },
+									py: 2.5,
+									borderRadius: 20,
+									border: "1px solid",
+									borderColor: "divider",
+									backgroundColor: "rgba(8, 15, 27, 0.68)",
+									backdropFilter: "blur(18px)",
+									display: "flex",
+									alignItems: "center",
+									justifyContent: "space-between",
+									gap: 2,
+									flexDirection: { xs: "column", md: "row" },
+								}}
+							>
+								<Box sx={{ color: "text.secondary", fontSize: 14 }}>
+									Color Studio for clean color inspection and export workflows.
+								</Box>
+								<Link
+									href="https://sametcc.me/repo/color-img-downloader"
+									target="_blank"
+									rel="noopener noreferrer"
+									sx={{
+										color: "text.primary",
+										textDecoration: "none",
+										fontWeight: 600,
+										fontSize: 14,
+										"&:hover": {
+											color: "primary.light",
+										},
+									}}
+								>
+									View source
+								</Link>
+							</Box>
+						</Box>
 					</Box>
 					<Analytics />
 				</Providers>

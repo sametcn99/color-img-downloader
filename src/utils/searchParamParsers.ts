@@ -97,7 +97,7 @@ export function parseColorRequestFromSearchParams(
 			errors.push("`formatValue` parameter is required.");
 		} else {
 			parsedFormat = formatResult.format;
-			const colorResult = parseColorValue(parsedFormat!, rawFormatValue);
+			const colorResult = parseColorValue(formatResult.format, rawFormatValue);
 			if (!colorResult.valid) {
 				errors.push(colorResult.error);
 			} else {
@@ -122,11 +122,11 @@ export function parseColorRequestFromSearchParams(
 	};
 }
 
-function parseFormatParam(formatParam: string | null): {
-	valid: boolean;
-	format?: ColorFormat;
-	error: string;
-} {
+function parseFormatParam(
+	formatParam: string | null,
+):
+	| { valid: true; format: ColorFormat; error: "" }
+	| { valid: false; error: string } {
 	if (!formatParam) {
 		return {
 			valid: false,

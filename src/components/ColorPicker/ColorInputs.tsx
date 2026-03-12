@@ -587,31 +587,68 @@ export const ColorInputs: React.FC<ColorInputsProps> = ({
 	};
 
 	return (
-		<Paper elevation={1} sx={{ p: 3 }}>
-			<Typography variant="h6" gutterBottom>
-				Color Values
-			</Typography>
+		<Paper
+			elevation={0}
+			sx={{
+				p: 3,
+				borderRadius: 3,
+				height: "100%",
+				background:
+					"linear-gradient(180deg, rgba(10, 18, 33, 0.88), rgba(8, 14, 26, 0.8))",
+			}}
+		>
+			<Stack spacing={2.5}>
+				<Box>
+					<Typography variant="overline" color="primary.light">
+						Precise entry
+					</Typography>
+					<Typography variant="h5">Color values</Typography>
+					<Typography variant="body2" color="text.secondary" sx={{ mt: 0.75 }}>
+						Switch between color models and enter exact values with real-time
+						conversion.
+					</Typography>
+				</Box>
 
-			<FormControl fullWidth sx={{ mb: 3 }}>
-				<InputLabel>Color Format</InputLabel>
-				<Select
-					value={selectedFormat}
-					label="Color Format"
-					onChange={(e) => setSelectedFormat(e.target.value as ColorFormat)}
+				<FormControl fullWidth>
+					<InputLabel>Color Format</InputLabel>
+					<Select
+						value={selectedFormat}
+						label="Color Format"
+						onChange={(e) => setSelectedFormat(e.target.value as ColorFormat)}
+						size="small"
+					>
+						{Object.entries(formatLabels).map(([format, label]) => (
+							<MenuItem key={format} value={format}>
+								{label}
+							</MenuItem>
+						))}
+					</Select>
+				</FormControl>
+
+				<Box
+					sx={{
+						p: 2,
+						borderRadius: 2,
+						backgroundColor: "rgba(7, 13, 24, 0.6)",
+						border: "1px solid",
+						borderColor: "divider",
+						"& .MuiStack-root": {
+							flexWrap: "wrap",
+						},
+						"& .MuiTextField-root": {
+							minWidth: { xs: "100%", sm: 120 },
+							flex: 1,
+						},
+					}}
 				>
-					{Object.entries(formatLabels).map(([format, label]) => (
-						<MenuItem key={format} value={format}>
-							{label}
-						</MenuItem>
-					))}
-				</Select>
-			</FormControl>
+					{renderInputs()}
+				</Box>
 
-			<Box sx={{ mb: 2 }}>{renderInputs()}</Box>
-
-			<Typography variant="body2" color="text.secondary" sx={{ mt: 2 }}>
-				{selectedFormat.toUpperCase()} format values with real-time updates
-			</Typography>
+				<Typography variant="body2" color="text.secondary">
+					{selectedFormat.toUpperCase()} values stay synchronized with every
+					other picker in the workspace.
+				</Typography>
+			</Stack>
 		</Paper>
 	);
 };

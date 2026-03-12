@@ -1,10 +1,15 @@
 "use client";
 
 import {
+	AutoAwesomeRounded,
+	CloudDownloadRounded,
+	InsightsRounded,
+	TuneRounded,
+} from "@mui/icons-material";
+import {
+	Alert,
 	Box,
 	Button,
-	Card,
-	CardContent,
 	Chip,
 	Container,
 	Dialog,
@@ -24,6 +29,7 @@ import { ColorPreview } from "../components/ColorPicker/ColorPreview";
 import { ColorSliders } from "../components/ColorPicker/ColorSliders";
 import { ColorWheelModal } from "../components/ColorPicker/ColorWheelModal";
 import { DownloadControls } from "../components/ColorPicker/DownloadControls";
+import { SquareColorPicker } from "../components/ColorPicker/SquareColorPicker";
 import type { DownloadOptions, RGBAColor } from "../types/color";
 import { rgbaToString } from "../utils/colorConversions";
 import {
@@ -130,24 +136,46 @@ function HomeContent() {
 		setColor(newColor);
 	};
 
+	const colorSummary = rgbaToString(color);
+
 	if (active) {
 		if (hasSearchErrors || !searchColor) {
 			return (
-				<Container maxWidth="sm" sx={{ py: { xs: 4, md: 8 } }}>
+				<Container maxWidth="sm" sx={{ py: { xs: 6, md: 10 } }}>
 					<Paper
-						elevation={3}
-						sx={{ p: { xs: 3, md: 4 }, borderRadius: 3, textAlign: "left" }}
+						elevation={0}
+						sx={{
+							p: { xs: 3.5, md: 4.5 },
+							borderRadius: 4,
+							textAlign: "left",
+							background:
+								"linear-gradient(180deg, rgba(16, 26, 46, 0.96), rgba(8, 14, 27, 0.92))",
+						}}
 					>
-						<Typography variant="h5" gutterBottom>
-							Parameter error
-						</Typography>
-						<Divider sx={{ mb: 2 }} />
-						<Stack spacing={1}>
-							{errors.map((error) => (
-								<Typography key={error} variant="body2" color="error">
-									{error}
+						<Stack spacing={2.5}>
+							<Chip
+								label="URL request issue"
+								color="secondary"
+								variant="outlined"
+								sx={{ alignSelf: "flex-start" }}
+							/>
+							<Box>
+								<Typography variant="h4" gutterBottom>
+									The requested color state could not be loaded
 								</Typography>
-							))}
+								<Typography variant="body1" color="text.secondary">
+									Some query parameters are malformed or incomplete. Review the
+									messages below and try again.
+								</Typography>
+							</Box>
+							<Divider />
+							<Stack spacing={1.25}>
+								{errors.map((error) => (
+									<Alert key={error} severity="error" variant="outlined">
+										{error}
+									</Alert>
+								))}
+							</Stack>
 						</Stack>
 					</Paper>
 				</Container>
@@ -156,22 +184,33 @@ function HomeContent() {
 
 		if (download) {
 			return (
-				<Container maxWidth="sm" sx={{ py: { xs: 4, md: 8 } }}>
+				<Container maxWidth="sm" sx={{ py: { xs: 6, md: 10 } }}>
 					<Paper
-						elevation={2}
-						sx={{ p: { xs: 3, md: 4 }, borderRadius: 3, textAlign: "center" }}
+						elevation={0}
+						sx={{
+							p: { xs: 3.5, md: 4.5 },
+							borderRadius: 4,
+							textAlign: "center",
+							background:
+								"linear-gradient(180deg, rgba(11, 21, 39, 0.96), rgba(7, 12, 23, 0.9))",
+						}}
 					>
-						<Typography variant="h6" gutterBottom>
-							Preparing your color file...
-						</Typography>
-						<Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-							The download should start automatically. If it does not, please
-							check your browser's pop-up settings.
-						</Typography>
-						{downloadError && (
-							<Typography variant="body2" color="error">
-								{downloadError}
+						<Stack spacing={2.5} alignItems="center">
+							<Chip label="Auto download" color="primary" />
+							<Typography variant="h4">Preparing your color file</Typography>
+							<Typography
+								variant="body1"
+								color="text.secondary"
+								sx={{ maxWidth: 420 }}
+							>
+								The export should begin automatically. If nothing happens, check
+								the browser download permission or popup settings.
 							</Typography>
+						</Stack>
+						{downloadError && (
+							<Alert severity="error" variant="outlined" sx={{ mt: 3 }}>
+								{downloadError}
+							</Alert>
 						)}
 					</Paper>
 				</Container>
@@ -211,8 +250,7 @@ function HomeContent() {
 					display: "flex",
 					alignItems: "center",
 					justifyContent: "center",
-					bgcolor: "background.default",
-					p: 3,
+					p: { xs: 2, md: 3 },
 				}}
 			>
 				<Box
@@ -220,15 +258,21 @@ function HomeContent() {
 						display: "flex",
 						flexDirection: "column",
 						alignItems: "center",
-						gap: 2,
+						gap: 2.5,
+						width: "100%",
+						maxWidth: 720,
 					}}
 				>
+					<Chip label="Preview mode" color="primary" />
+					<Typography variant="h4" textAlign="center">
+						Color asset preview
+					</Typography>
 					<Box
 						sx={{
 							position: "relative",
-							borderRadius: 2,
+							borderRadius: 3,
 							overflow: "hidden",
-							boxShadow: 6,
+							boxShadow: "0 32px 64px rgba(0, 0, 0, 0.36)",
 							width: previewWidth,
 							height: previewHeight,
 							backgroundColor: colorString,
@@ -254,20 +298,24 @@ function HomeContent() {
 							/>
 						)}
 					</Box>
-					<Typography variant="body2" color="text.secondary">
-						{size.width}×{size.height} · {extension.toUpperCase()}
-					</Typography>
+					<Stack spacing={0.75} alignItems="center">
+						<Typography variant="body1">{colorString}</Typography>
+						<Typography variant="body2" color="text.secondary">
+							{size.width}×{size.height} · {extension.toUpperCase()}
+						</Typography>
+					</Stack>
 					<Button
 						variant="contained"
 						onClick={handleManualDownload}
 						disabled={isManualDownloadPending}
+						size="large"
 					>
 						{isManualDownloadPending ? "Downloading..." : "Download color"}
 					</Button>
 					{downloadError && (
-						<Typography variant="body2" color="error">
+						<Alert severity="error" variant="outlined" sx={{ width: "100%" }}>
 							{downloadError}
-						</Typography>
+						</Alert>
 					)}
 				</Box>
 			</Box>
@@ -276,184 +324,214 @@ function HomeContent() {
 
 	return (
 		<>
-			<Container maxWidth="xl" sx={{ py: { xs: 2, md: 4 } }}>
-				{/* Header Section */}
+			<Container maxWidth="xl" sx={{ py: { xs: 2.5, md: 5 } }}>
 				<Paper
 					elevation={0}
 					sx={{
-						color: "white",
-						p: { xs: 3, md: 4 },
+						position: "relative",
+						overflow: "hidden",
+						p: { xs: 3, md: 5 },
 						mb: 4,
-						borderRadius: 3,
-						textAlign: "center",
+						borderRadius: { xs: 3, md: 4 },
+						background:
+							"linear-gradient(135deg, rgba(10, 19, 34, 0.96) 0%, rgba(9, 27, 50, 0.92) 58%, rgba(47, 24, 11, 0.9) 100%)",
+						"&::before": {
+							content: '""',
+							position: "absolute",
+							inset: 0,
+							background:
+								"radial-gradient(circle at top left, rgba(125, 211, 252, 0.24), transparent 28%), radial-gradient(circle at bottom right, rgba(251, 191, 36, 0.18), transparent 24%)",
+							pointerEvents: "none",
+						},
 					}}
 				>
-					<Typography
-						variant="h3"
-						component="h1"
-						fontWeight="bold"
-						sx={{ mb: 2 }}
-					>
-						Color Studio
-					</Typography>
-					<Typography
-						variant="h6"
-						sx={{ opacity: 0.9, maxWidth: 600, mx: "auto" }}
-					>
-						Professional color picker with advanced controls and export options
-					</Typography>
-					<Stack
-						direction="row"
-						spacing={1}
-						justifyContent="center"
-						sx={{ mt: 2 }}
-					>
-						<Chip
-							label="PNG Export"
-							variant="outlined"
-							sx={{ color: "white", borderColor: "rgba(255,255,255,0.3)" }}
-						/>
-						<Chip
-							label="JPEG Export"
-							variant="outlined"
-							sx={{ color: "white", borderColor: "rgba(255,255,255,0.3)" }}
-						/>
-						<Chip
-							label="SVG Export"
-							variant="outlined"
-							sx={{ color: "white", borderColor: "rgba(255,255,255,0.3)" }}
-						/>
-					</Stack>
-					<Box
-						sx={{
-							mt: 3,
-							display: "flex",
-							flexDirection: "column",
-							alignItems: "center",
-							gap: 1.5,
-						}}
-					>
-						<Typography
-							variant="body1"
-							align="center"
-							sx={{ color: "rgba(255,255,255,0.85)" }}
-						>
-							Instantly load or download colors with URL search parameters.
-						</Typography>
-						<Button
-							variant="outlined"
-							color="inherit"
-							onClick={openInfoDialog}
-							sx={{ borderColor: "rgba(255,255,255,0.4)" }}
-						>
-							Learn how it works
-						</Button>
-					</Box>
-				</Paper>
-
-				<Grid container spacing={3}>
-					{/* Color Preview Section */}
-					<Grid
-						size={{
-							lg: 4,
-							xs: 12,
-						}}
-					>
-						<Card
-							elevation={2}
-							sx={{
-								height: "100%",
-								borderRadius: 3,
-								overflow: "visible",
-							}}
-						>
-							<CardContent sx={{ p: 3 }}>
-								<Typography variant="h6" fontWeight="600" gutterBottom>
-									Color Preview
-								</Typography>
-								<Divider sx={{ mb: 3 }} />
-
-								<Stack spacing={3} alignItems="center">
-									<ColorPreview color={color} size={200} />
-									<ColorWheelModal
-										color={color}
-										onColorChange={handleColorChange}
-										size={200}
-										modalSize={500}
-									/>
-								</Stack>
-							</CardContent>
-						</Card>
-					</Grid>
-
-					{/* Controls Section */}
-					<Grid
-						size={{
-							lg: 8,
-							xs: 12,
-						}}
-					>
-						<Stack spacing={3}>
-							{/* Color Inputs */}
-							<Card elevation={2} sx={{ borderRadius: 3 }}>
-								<CardContent sx={{ p: 3 }}>
-									<Typography variant="h6" fontWeight="600" gutterBottom>
-										Precise Controls
+					<Grid container spacing={4} sx={{ position: "relative", zIndex: 1 }}>
+						<Grid size={{ xs: 12, lg: 8 }}>
+							<Stack spacing={3}>
+								<Chip
+									icon={<AutoAwesomeRounded />}
+									label="Creative studio workflow"
+									color="default"
+									sx={{ alignSelf: "flex-start", color: "text.primary" }}
+								/>
+								<Box>
+									<Typography
+										variant="h1"
+										component="h1"
+										sx={{ maxWidth: 760 }}
+									>
+										Build polished color assets with precise controls
 									</Typography>
-									<Divider sx={{ mb: 3 }} />
-									<ColorInputs
-										color={color}
-										onColorChange={handleColorChange}
-									/>
-								</CardContent>
-							</Card>
-
-							{/* Color Sliders */}
-							<Card elevation={2} sx={{ borderRadius: 3, height: "100%" }}>
-								<CardContent sx={{ p: 3, height: "100%" }}>
-									<Typography variant="h6" fontWeight="600" gutterBottom>
-										Visual Sliders
-									</Typography>
-									<Divider sx={{ mb: 3 }} />
-									<ColorSliders
-										color={color}
-										onColorChange={handleColorChange}
-									/>
-								</CardContent>
-							</Card>
-						</Stack>
-					</Grid>
-
-					{/* Download Section */}
-					<Grid
-						size={{
-							lg: 12,
-							xs: 12,
-						}}
-					>
-						<Card
-							elevation={3}
-							sx={{
-								borderRadius: 3,
-							}}
-						>
-							<CardContent sx={{ p: 4 }}>
-								<Box textAlign="center" sx={{ mb: 3 }}>
-									<Typography variant="h6" fontWeight="600" gutterBottom>
-										Export Your Color
-									</Typography>
-									<Typography variant="body2" color="text.secondary">
-										Download your custom color in multiple formats
+									<Typography
+										variant="h6"
+										color="text.secondary"
+										sx={{ maxWidth: 720, mt: 2 }}
+									>
+										Dial in a color visually or numerically, inspect it across
+										color spaces, then export clean PNG, JPEG, or SVG assets
+										without leaving the workspace.
 									</Typography>
 								</Box>
+								<Stack direction="row" spacing={1} useFlexGap flexWrap="wrap">
+									<Chip
+										icon={<CloudDownloadRounded />}
+										label="PNG, JPEG, SVG export"
+									/>
+									<Chip
+										icon={<TuneRounded />}
+										label="Multi-format numeric controls"
+									/>
+									<Chip
+										icon={<InsightsRounded />}
+										label="Shareable URL states"
+									/>
+								</Stack>
+								<Stack
+									direction={{ xs: "column", sm: "row" }}
+									spacing={1.5}
+									alignItems={{ xs: "stretch", sm: "center" }}
+								>
+									<Button
+										variant="contained"
+										size="large"
+										onClick={openInfoDialog}
+									>
+										URL parameter guide
+									</Button>
+									<Typography variant="body2" color="text.secondary">
+										Use query params to open directly in preview or
+										auto-download mode.
+									</Typography>
+								</Stack>
+							</Stack>
+						</Grid>
+						<Grid size={{ xs: 12, lg: 4 }}>
+							<Paper
+								elevation={0}
+								sx={{
+									p: 3,
+									height: "100%",
+									background:
+										"linear-gradient(180deg, rgba(9, 19, 35, 0.88), rgba(7, 12, 22, 0.72))",
+								}}
+							>
+								<Stack spacing={2.5}>
+									<Box>
+										<Typography variant="overline" color="secondary.light">
+											Current working color
+										</Typography>
+										<Typography variant="h4">{colorSummary}</Typography>
+									</Box>
+									<Box
+										sx={{
+											height: 220,
+											borderRadius: 3,
+											background: colorSummary,
+											border: "1px solid rgba(255,255,255,0.12)",
+											boxShadow: "inset 0 1px 0 rgba(255,255,255,0.08)",
+										}}
+									/>
+									<Stack spacing={1.25}>
+										<Stack direction="row" justifyContent="space-between">
+											<Typography variant="body2" color="text.secondary">
+												Formats
+											</Typography>
+											<Typography variant="body2">11 color spaces</Typography>
+										</Stack>
+										<Stack direction="row" justifyContent="space-between">
+											<Typography variant="body2" color="text.secondary">
+												Export pipeline
+											</Typography>
+											<Typography variant="body2">
+												1-click asset output
+											</Typography>
+										</Stack>
+									</Stack>
+								</Stack>
+							</Paper>
+						</Grid>
+					</Grid>
+				</Paper>
 
+				<Stack spacing={1} sx={{ mb: 3 }}>
+					<Typography variant="overline" color="primary.light">
+						Workspace
+					</Typography>
+					<Typography variant="h3">Pick, inspect, and refine</Typography>
+					<Typography
+						variant="body1"
+						color="text.secondary"
+						sx={{ maxWidth: 760 }}
+					>
+						The layout keeps the live preview visible while grouping numeric
+						input, visual adjustment, and export steps into clearer zones.
+					</Typography>
+				</Stack>
+
+				<Grid container spacing={3}>
+					<Grid size={{ lg: 4, xs: 12 }} sx={{ display: "flex" }}>
+						<ColorPreview color={color} size={224} />
+					</Grid>
+
+					<Grid size={{ lg: 8, xs: 12 }}>
+						<Grid container spacing={3}>
+							<Grid size={{ md: 6, xs: 12 }}>
+								<ColorInputs color={color} onColorChange={handleColorChange} />
+							</Grid>
+							<Grid size={{ md: 6, xs: 12 }}>
+								<ColorSliders color={color} onColorChange={handleColorChange} />
+							</Grid>
+							<Grid size={{ md: 6, xs: 12 }}>
+								<ColorWheelModal
+									color={color}
+									onColorChange={handleColorChange}
+									size={280}
+									modalSize={500}
+								/>
+							</Grid>
+							<Grid size={{ md: 6, xs: 12 }}>
+								<SquareColorPicker
+									color={color}
+									onColorChange={handleColorChange}
+								/>
+							</Grid>
+						</Grid>
+					</Grid>
+
+					<Grid size={{ lg: 12, xs: 12 }}>
+						<Paper
+							elevation={0}
+							sx={{
+								p: { xs: 3, md: 4 },
+								borderRadius: { xs: 3, md: 4 },
+								background:
+									"linear-gradient(135deg, rgba(8, 15, 27, 0.92) 0%, rgba(9, 21, 37, 0.96) 50%, rgba(19, 16, 7, 0.88) 100%)",
+							}}
+						>
+							<Stack spacing={3}>
+								<Box textAlign="center">
+									<Typography variant="overline" color="secondary.light">
+										Export pipeline
+									</Typography>
+									<Typography variant="h3" sx={{ mt: 0.5 }}>
+										Ship the exact color asset you need
+									</Typography>
+									<Typography
+										variant="body1"
+										color="text.secondary"
+										sx={{ maxWidth: 720, mx: "auto", mt: 1.25 }}
+									>
+										Choose a preset, fine tune output quality, and generate a
+										shareable URL for repeatable exports.
+									</Typography>
+								</Box>
 								<Box display="flex" justifyContent="center">
-									<Box sx={{ maxWidth: 500, width: "100%" }}>
+									<Box sx={{ width: "100%", maxWidth: 760 }}>
 										<DownloadControls color={color} />
 									</Box>
 								</Box>
-							</CardContent>
-						</Card>
+							</Stack>
+						</Paper>
 					</Grid>
 				</Grid>
 			</Container>
@@ -463,6 +541,7 @@ function HomeContent() {
 				onClose={closeInfoDialog}
 				maxWidth="md"
 				fullWidth
+				sx={{ "& .MuiDialog-paper": { borderRadius: 3 } }}
 			>
 				<DialogTitle>URL Search Parameters</DialogTitle>
 				<DialogContent dividers>
@@ -520,7 +599,7 @@ function HomeContent() {
 						</Typography>
 					</Stack>
 				</DialogContent>
-				<DialogActions>
+				<DialogActions sx={{ px: 3, pb: 3 }}>
 					<Button onClick={closeInfoDialog} autoFocus>
 						Close
 					</Button>
