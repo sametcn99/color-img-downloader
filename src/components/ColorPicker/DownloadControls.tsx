@@ -20,6 +20,7 @@ import {
 	IconButton,
 	InputAdornment,
 	InputLabel,
+	ListSubheader,
 	MenuItem,
 	Paper,
 	Select,
@@ -64,6 +65,25 @@ const SHARE_FORMAT_LABELS: Record<ColorFormat, string> = {
 	lch: "LCH",
 };
 
+const STANDARD_SHARE_FORMATS: readonly ColorFormat[] = [
+	"hex",
+	"rgb",
+	"hsl",
+	"hsv",
+	"cmyk",
+	"lab",
+	"hwb",
+	"lch",
+];
+
+const OPACITY_SHARE_FORMATS: readonly ColorFormat[] = ["rgba", "hsla", "hsva"];
+
+const JPEG_SHARE_FORMAT_FALLBACKS: Partial<Record<ColorFormat, ColorFormat>> = {
+	rgba: "rgb",
+	hsla: "hsl",
+	hsva: "hsv",
+};
+
 const PRESET_SIZES = [
 	{ label: "Custom", width: 0, height: 0 },
 	{ label: "1x1 Pixel", width: 1, height: 1 },
@@ -92,6 +112,7 @@ export const DownloadControls: React.FC<DownloadControlsProps> = ({
 	const [isShareCopied, setIsShareCopied] = useState(false);
 	const [isDownloading, setIsDownloading] = useState(false);
 	const [error, setError] = useState<string | null>(null);
+	const isJpegSelected = downloadOptions.format === "jpeg";
 
 	const getCurrentPreset = () => {
 		const currentPreset = PRESET_SIZES.find(
@@ -157,6 +178,14 @@ export const DownloadControls: React.FC<DownloadControlsProps> = ({
 			setShareBaseUrl(`${window.location.origin}${window.location.pathname}`);
 		}
 	}, []);
+
+	useEffect(() => {
+		if (!isJpegSelected || !OPACITY_SHARE_FORMATS.includes(shareFormat)) {
+			return;
+		}
+
+		setShareFormat(JPEG_SHARE_FORMAT_FALLBACKS[shareFormat] ?? "hex");
+	}, [isJpegSelected, shareFormat]);
 
 	const shareFormatValue = useMemo(() => {
 		const formatted = formatColorString(color, shareFormat);
@@ -524,13 +553,22 @@ export const DownloadControls: React.FC<DownloadControlsProps> = ({
 											setShareFormat(event.target.value as ColorFormat)
 										}
 									>
-										{Object.entries(SHARE_FORMAT_LABELS).map(
-											([value, label]) => (
-												<MenuItem key={value} value={value}>
-													{label}
-												</MenuItem>
-											),
-										)}
+										<ListSubheader disableSticky>Standard</ListSubheader>
+										{STANDARD_SHARE_FORMATS.map((value) => (
+											<MenuItem key={value} value={value}>
+												{SHARE_FORMAT_LABELS[value]}
+											</MenuItem>
+										))}
+										<ListSubheader disableSticky>Opacity</ListSubheader>
+										{OPACITY_SHARE_FORMATS.map((value) => (
+											<MenuItem
+												key={value}
+												value={value}
+												disabled={isJpegSelected}
+											>
+												{SHARE_FORMAT_LABELS[value]}
+											</MenuItem>
+										))}
 									</Select>
 								</FormControl>
 
